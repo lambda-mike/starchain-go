@@ -6,15 +6,18 @@ import (
 	"time"
 )
 
-var ts int64 = time.Date(2020, time.June, 14, 17, 46, 32, 0, time.UTC).Unix()
+var (
+	data []byte = []byte("\"This is JSON string\"")
+	ts   int64  = time.Date(2020, time.June, 14, 17, 46, 32, 0, time.UTC).Unix()
+	h    int64  = 0
+)
 
 func TestNewBlock(t *testing.T) {
 	t.Log("TestNewBlock")
 	{
-		data := []byte("\"This is JSON string\"")
-		t.Logf("\tGiven correct time stamp (%d) and string data (%s)", ts, data)
+		t.Logf("\tGiven correct timestamp (%d) and string data (%s)", ts, data)
 		{
-			block := NewBlock(ts, data)
+			block := NewBlock(ts, h, data)
 			if block == nil {
 				t.Fatalf("\t\tShould return new Block, got: nil")
 			}
@@ -35,9 +38,14 @@ func TestNewBlock(t *testing.T) {
 			}
 			t.Log("\t\tShould save data as hex")
 		}
+	}
+}
 
+func TestNewBlockBadTS(t *testing.T) {
+	t.Log("TestNewBlock")
+	{
 		var badTS int64 = 0
-		t.Log("\tGiven incorrect time stamp", badTS)
+		t.Log("\tGiven incorrect timestamp", badTS)
 		{
 			defer func() {
 				err := recover()
@@ -45,9 +53,28 @@ func TestNewBlock(t *testing.T) {
 					t.Log("\t\tShould panic", err)
 					return
 				}
-				t.Fatal("\t\tShould panic but got null instead")
+				t.Fatal("\t\tShould panic but got nil instead")
 			}()
-			_ = NewBlock(badTS, data)
+			_ = NewBlock(badTS, h, data)
+		}
+	}
+}
+
+func TestNewBlockBadHeight(t *testing.T) {
+	t.Log("TestNewBlock")
+	{
+		var badHeight int64 = -1
+		t.Log("\tGiven incorrect height", badHeight)
+		{
+			defer func() {
+				err := recover()
+				if err != nil {
+					t.Log("\t\tShould panic", err)
+					return
+				}
+				t.Fatal("\t\tShould panic but got nil instead")
+			}()
+			_ = NewBlock(ts, badHeight, data)
 		}
 	}
 }
@@ -58,13 +85,13 @@ func TestGetData(t *testing.T) {
 		data := []byte("\"This is random JSON string\"")
 		t.Logf("\tGiven a block with data (%s)", data)
 		{
-			block := NewBlock(ts, data)
+			block := NewBlock(ts, h, data)
 			actual := block.GetData()
 
 			if string(actual) != string(data) {
 				t.Fatalf("\t\tShould return the same data, got: (%s)", actual)
 			}
-			t.Logf("\t\tShould return the same data.")
+			t.Logf("\t\tShould return the same data")
 		}
 	}
 }
@@ -74,29 +101,29 @@ func TestValidate(t *testing.T) {
 	{
 		t.Logf("\tGiven a block without data (nil)")
 		{
-			block := NewBlock(ts, nil)
+			block := NewBlock(ts, h, nil)
 			isValid := block.Validate()
 			if !isValid {
 				t.Fatalf("\t\tShould return true, got: %v", isValid)
 			}
-			t.Logf("\t\tShould return true.")
+			t.Logf("\t\tShould return true")
 		}
 		data := []byte("\"This is original data\"")
 		t.Logf("\tGiven a block with data (%s)", data)
 		{
-			block := NewBlock(ts, data)
+			block := NewBlock(ts, h, data)
 			isValid := block.Validate()
 			if !isValid {
 				t.Fatalf("\t\tShould return true, got: %v", isValid)
 			}
-			t.Logf("\t\tShould return true.")
+			t.Logf("\t\tShould return true")
 		}
 		t.Logf("\tGiven a block with data (%s)", data)
 		{
 			t.Log("\t\tWhen data was changed")
 			{
-				block := NewBlock(ts, data)
-				block.data = []byte("Not this time!")
+				block := NewBlock(ts, h, data)
+				block.data = []byte(string(data) + " Not this time!")
 				isValid := block.Validate()
 				if isValid {
 					t.Fatal("\t\t\tShould return false, but got true")
@@ -108,13 +135,26 @@ func TestValidate(t *testing.T) {
 		{
 			t.Log("\t\tWhen ts was changed")
 			{
-				block := NewBlock(ts, data)
+				block := NewBlock(ts, h, data)
 				block.ts = 1
 				isValid := block.Validate()
 				if isValid {
 					t.Fatal("\t\t\tShould return false, but got true")
 				}
-				t.Log("\t\t\tShould return false.")
+				t.Log("\t\t\tShould return false")
+			}
+		}
+		t.Logf("\tGiven a block with height (%v)", h)
+		{
+			t.Log("\t\tWhen height was changed")
+			{
+				block := NewBlock(ts, h, data)
+				block.height = h + 11
+				isValid := block.Validate()
+				if isValid {
+					t.Fatal("\t\t\tShould return false, but got true")
+				}
+				t.Log("\t\t\tShould return false")
 			}
 		}
 	}
