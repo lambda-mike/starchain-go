@@ -34,6 +34,24 @@ func TestNewBlock(t *testing.T) {
 				}
 				t.Log("\t\tShould save data as hex")
 			}
+			t.Log("\t\tShould save data as hex")
+		}
+	}
+}
+
+func TestGetData(t *testing.T) {
+	t.Log("GetData")
+	{
+		data := []byte("\"This is random JSON string\"")
+		t.Logf("\tGiven a block with data (%s)", data)
+		{
+			block := NewBlock(data)
+			actual := block.GetData()
+
+			if string(actual) != string(data) {
+				t.Fatalf("\t\tShould return the same data, got: (%s)", actual)
+			}
+			t.Logf("\t\tShould return the same data.")
 		}
 	}
 }

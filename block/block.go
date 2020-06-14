@@ -13,3 +13,7 @@ func NewBlock(data []byte) *Block {
 	hex.Encode(dataHex, data)
 	return &Block{dataHex}
 }
+
+func (b *Block) GetData() []byte {
+	return nil
+}
