@@ -3,15 +3,18 @@ package block
 import (
 	"encoding/hex"
 	"testing"
+	"time"
 )
+
+var ts int64 = time.Date(2020, time.June, 14, 17, 46, 32, 0, time.UTC).Unix()
 
 func TestNewBlock(t *testing.T) {
 	t.Log("TestNewBlock")
 	{
 		data := []byte("\"This is JSON string\"")
-		t.Logf("\tGiven string data (%s)", data)
+		t.Logf("\tGiven correct time stamp (%d) and string data (%s)", ts, data)
 		{
-			block := NewBlock(data)
+			block := NewBlock(ts, data)
 			if block == nil {
 				t.Fatalf("\t\tShould return new Block, got: nil")
 			}
@@ -32,6 +35,20 @@ func TestNewBlock(t *testing.T) {
 			}
 			t.Log("\t\tShould save data as hex")
 		}
+
+		var badTS int64 = 0
+		t.Log("\tGiven incorrect time stamp", badTS)
+		{
+			defer func() {
+				err := recover()
+				if err != nil {
+					t.Log("\t\tShould panic", err)
+					return
+				}
+				t.Fatal("\t\tShould panic but got null instead")
+			}()
+			_ = NewBlock(badTS, data)
+		}
 	}
 }
 
@@ -41,7 +58,7 @@ func TestGetData(t *testing.T) {
 		data := []byte("\"This is random JSON string\"")
 		t.Logf("\tGiven a block with data (%s)", data)
 		{
-			block := NewBlock(data)
+			block := NewBlock(ts, data)
 			actual := block.GetData()
 
 			if string(actual) != string(data) {
@@ -57,7 +74,7 @@ func TestValidate(t *testing.T) {
 	{
 		t.Logf("\tGiven a block without data (nil)")
 		{
-			block := NewBlock(nil)
+			block := NewBlock(ts, nil)
 			isValid := block.Validate()
 			if !isValid {
 				t.Fatalf("\t\tShould return true, got: %v", isValid)
@@ -67,7 +84,7 @@ func TestValidate(t *testing.T) {
 		data := []byte("\"This is original data\"")
 		t.Logf("\tGiven a block with data (%s)", data)
 		{
-			block := NewBlock(data)
+			block := NewBlock(ts, data)
 			isValid := block.Validate()
 			if !isValid {
 				t.Fatalf("\t\tShould return true, got: %v", isValid)
@@ -78,13 +95,26 @@ func TestValidate(t *testing.T) {
 		{
 			t.Log("\t\tWhen data was changed")
 			{
-				block := NewBlock(data)
+				block := NewBlock(ts, data)
 				block.data = []byte("Not this time!")
 				isValid := block.Validate()
 				if isValid {
-					t.Fatal("\t\t\tShould return false")
+					t.Fatal("\t\t\tShould return false, but got true")
 				}
 				t.Log("\t\t\tShould return false")
+			}
+		}
+		t.Logf("\tGiven a block with ts (%v)", ts)
+		{
+			t.Log("\t\tWhen ts was changed")
+			{
+				block := NewBlock(ts, data)
+				block.ts = 1
+				isValid := block.Validate()
+				if isValid {
+					t.Fatal("\t\t\tShould return false, but got true")
+				}
+				t.Log("\t\t\tShould return false.")
 			}
 		}
 	}

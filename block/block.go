@@ -3,20 +3,28 @@ package block
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
+	"log"
 )
 
 type Block struct {
 	data []byte
 	hash [sha256.Size]byte
+	ts   int64
 }
 
-// TODO add timestamp
+var WrongTimeStampErr error = errors.New("Timestamp must be bigger than 0")
+
 // TODO add height
 // TODO add prevHash
 // TODO add owner
-func NewBlock(data []byte) *Block {
+func NewBlock(ts int64, data []byte) *Block {
+	if ts <= 0 {
+		log.Panic(WrongTimeStampErr, ts)
+	}
 	var block Block
+	block.ts = ts
 	if data != nil {
 		dataHex := make([]byte, hex.EncodedLen(len(data)))
 		hex.Encode(dataHex, data)
@@ -35,7 +43,7 @@ func (b *Block) CalculateHash() [sha256.Size]byte {
 	if b.data != nil {
 		data = fmt.Sprintf("%s", b.data)
 	}
-	blockFields := fmt.Sprintf("%s", data)
+	blockFields := fmt.Sprintf("%d|%s", b.ts, data)
 	return sha256.Sum256([]byte(blockFields))
 }
 
