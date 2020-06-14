@@ -1,9 +1,15 @@
 package block
 
+import (
+	"encoding/hex"
+)
+
 type Block struct {
-	data string
+	data []byte
 }
 
-func NewBlock(data string) *Block {
-	return &Block{data}
+func NewBlock(data []byte) *Block {
+	dataHex := make([]byte, hex.EncodedLen(len(data)))
+	hex.Encode(dataHex, data)
+	return &Block{dataHex}
 }

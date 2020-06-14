@@ -1,6 +1,7 @@
 package block
 
 import (
+	"encoding/hex"
 	"testing"
 )
 
@@ -9,16 +10,29 @@ func TestNewBlock(t *testing.T) {
 	{
 		t.Log("TestNewBlock")
 		{
-			const data = "\"This is JSON string\""
-			t.Logf("\tGiven string data (%v)", data)
+			data := []byte("\"This is JSON string\"")
+			t.Logf("\tGiven string data (%s)", data)
 			{
 				block := NewBlock(data)
 				if block == nil {
 					t.Errorf("\t\tShould return new Block, got: nil")
 				}
-				if block.data != data {
-					t.Errorf("\t\tNew block should contain data, got: %v", block.data)
+				t.Log("\t\tShould return new Block")
+
+				expected := make([]byte, hex.EncodedLen(len(data)))
+				hex.Encode(expected, data)
+				actual := block.data
+				if len(actual) != len(expected) {
+					t.Errorf("\t\tShould save data of proper length (%v), got: %v", len(expected), len(actual))
 				}
+				t.Logf("\t\tShould save data of proper length (%v)", len(expected))
+
+				for i, b := range actual {
+					if b != expected[i] {
+						t.Errorf("\t\tShould contain the same byte at index: %v, got: %v ", i, b)
+					}
+				}
+				t.Log("\t\tShould save data as hex")
 			}
 		}
 	}
