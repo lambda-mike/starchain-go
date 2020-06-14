@@ -12,7 +12,7 @@ func TestNewBlock(t *testing.T) {
 			const data = "\"This is JSON string\""
 			t.Logf("\tGiven string data (%v)", data)
 			{
-				block := NewBlock()
+				block := NewBlock(data)
 				if block == nil {
 					t.Errorf("\t\tShould return new Block, got: nil")
 				}

@@ -4,6 +4,6 @@ type Block struct {
 	data string
 }
 
-func NewBlock() *Block {
-	return &Block{}
+func NewBlock(data string) *Block {
+	return &Block{data}
 }
