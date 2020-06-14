@@ -20,5 +20,7 @@ func NewBlock(data []byte) *Block {
 }
 
 func (b *Block) GetData() []byte {
-	return nil
+	decoded := make([]byte, hex.DecodedLen(len(b.data)))
+	hex.Decode(decoded, b.data)
+	return decoded
 }
