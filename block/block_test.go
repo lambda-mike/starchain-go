@@ -51,3 +51,41 @@ func TestGetData(t *testing.T) {
 		}
 	}
 }
+
+func TestValidate(t *testing.T) {
+	t.Log("Validate")
+	{
+		t.Logf("\tGiven a block without data (nil)")
+		{
+			block := NewBlock(nil)
+			isValid := block.Validate()
+			if !isValid {
+				t.Fatalf("\t\tShould return true, got: %v", isValid)
+			}
+			t.Logf("\t\tShould return true.")
+		}
+		data := []byte("\"This is original data\"")
+		t.Logf("\tGiven a block with data (%s)", data)
+		{
+			block := NewBlock(data)
+			isValid := block.Validate()
+			if !isValid {
+				t.Fatalf("\t\tShould return true, got: %v", isValid)
+			}
+			t.Logf("\t\tShould return true.")
+		}
+		t.Logf("\tGiven a block with data (%s)", data)
+		{
+			t.Log("\t\tWhen data was changed")
+			{
+				block := NewBlock(data)
+				block.data = []byte("Not this time!")
+				isValid := block.Validate()
+				if isValid {
+					t.Fatal("\t\t\tShould return false")
+				}
+				t.Log("\t\t\tShould return false")
+			}
+		}
+	}
+}
