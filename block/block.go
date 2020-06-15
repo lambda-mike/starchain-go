@@ -38,6 +38,7 @@ func NewBlock(ts int64, height int64, owner string, prevHash *[sha256.Size]byte,
 	}
 	var block Block
 	block.ts = ts
+	block.height = height
 	block.owner = owner
 	if prevHash == nil {
 		block.prevHash = nil

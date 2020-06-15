@@ -10,7 +10,7 @@ import (
 var (
 	data  []byte            = []byte("\"This is JSON string\"")
 	ts    int64             = time.Date(2020, time.June, 14, 17, 46, 32, 0, time.UTC).Unix()
-	h     int64             = 0
+	h     int64             = 7
 	prevH [sha256.Size]byte = sha256.Sum256([]byte("Here goes proper hash of the block"))
 	owner string            = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
 )
@@ -25,6 +25,18 @@ func TestNewBlock(t *testing.T) {
 				t.Fatalf("\t\tShould return new Block, got: nil")
 			}
 			t.Log("\t\tShould return new Block")
+
+			if block.ts != ts {
+				t.Fatalf("\t\tShould save timestamp (%v), got: %v", ts, block.ts)
+			}
+
+			if block.height != h {
+				t.Fatalf("\t\tShould save height (%v), got: %v", h, block.height)
+			}
+
+			if block.owner != owner {
+				t.Fatalf("\t\tShould save owner (%v), got: %v", owner, block.owner)
+			}
 
 			expected := make([]byte, hex.EncodedLen(len(data)))
 			hex.Encode(expected, data)
