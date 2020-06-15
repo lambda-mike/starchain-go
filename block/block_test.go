@@ -40,6 +40,13 @@ func TestNewBlock(t *testing.T) {
 				}
 			}
 			t.Log("\t\tShould save data as hex")
+
+			for i, b := range block.prevHash {
+				if prevH[i] != b {
+					t.Fatalf("\t\tShould contain the same byte for prevHash at index: %v, got: %v ", i, b)
+				}
+			}
+			t.Log("\t\tShould have correct prevHash bytes")
 		}
 	}
 }
@@ -167,6 +174,32 @@ func TestValidate(t *testing.T) {
 			{
 				block := NewBlock(ts, h, owner, &prevH, data)
 				block.height = h + 11
+				isValid := block.Validate()
+				if isValid {
+					t.Fatal("\t\t\tShould return false, but got true")
+				}
+				t.Log("\t\t\tShould return false")
+			}
+		}
+		t.Logf("\tGiven a block with owner (%v)", owner)
+		{
+			t.Log("\t\tWhen owner was changed")
+			{
+				block := NewBlock(ts, h, owner, &prevH, data)
+				block.owner += "boom!"
+				isValid := block.Validate()
+				if isValid {
+					t.Fatal("\t\t\tShould return false, but got true")
+				}
+				t.Log("\t\t\tShould return false")
+			}
+		}
+		t.Logf("\tGiven a block with prevHash (%s)", prevH)
+		{
+			t.Log("\t\tWhen prevHash was changed")
+			{
+				block := NewBlock(ts, h, owner, &prevH, data)
+				block.prevHash[2] = 22
 				isValid := block.Validate()
 				if isValid {
 					t.Fatal("\t\t\tShould return false, but got true")

@@ -10,7 +10,8 @@ import (
 
 // Block struct represents single block in the blockchain.
 // It consists of timestamp (ts), height, address of the owner's wallet,
-// data encoded as []byte of hex values, and SHA256 hash of the block.
+// previous block hash, data encoded as []byte of hex values,
+// and SHA256 hash of the block.
 type Block struct {
 	ts       int64
 	height   int64
@@ -25,7 +26,6 @@ var (
 	NegativeHeightErr error = errors.New("Height must be greater than or equal 0")
 )
 
-// TODO add prevHash
 // NewBlock fn creates a brand new Block.
 // It panics when timestamp is less than or equal 0.
 // It panics when height is negative.
@@ -38,6 +38,13 @@ func NewBlock(ts int64, height int64, owner string, prevHash *[sha256.Size]byte,
 	}
 	var block Block
 	block.ts = ts
+	block.owner = owner
+	if prevHash == nil {
+		block.prevHash = nil
+	} else {
+		block.prevHash = new([sha256.Size]byte)
+		copy(block.prevHash[:], prevHash[:])
+	}
 	if data != nil {
 		dataHex := make([]byte, hex.EncodedLen(len(data)))
 		hex.Encode(dataHex, data)
@@ -45,20 +52,21 @@ func NewBlock(ts int64, height int64, owner string, prevHash *[sha256.Size]byte,
 	}
 	hash := block.CalculateHash()
 	block.hash = hash
-	block.owner = owner
-	block.prevHash = prevHash
 	return &block
 }
 
 // CalculateHash method calculates the sha256 hash of the block properties
 // except the hash field and returns that value.
 func (b *Block) CalculateHash() [sha256.Size]byte {
-	// TODO other props!!
 	data := ""
 	if b.data != nil {
 		data = fmt.Sprintf("%s", b.data)
 	}
-	blockFields := fmt.Sprintf("%d|%d|%s", b.ts, b.height, data)
+	prevH := ""
+	if b.prevHash != nil {
+		prevH = fmt.Sprintf("%s", b.prevHash)
+	}
+	blockFields := fmt.Sprintf("|%d|%d|%s|%s|%s|", b.ts, b.height, b.owner, prevH, data)
 	return sha256.Sum256([]byte(blockFields))
 }
 
