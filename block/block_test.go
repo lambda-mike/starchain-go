@@ -1,16 +1,18 @@
 package block
 
 import (
+	"crypto/sha256"
 	"encoding/hex"
 	"testing"
 	"time"
 )
 
 var (
-	data  []byte = []byte("\"This is JSON string\"")
-	ts    int64  = time.Date(2020, time.June, 14, 17, 46, 32, 0, time.UTC).Unix()
-	h     int64  = 0
-	owner string = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
+	data  []byte            = []byte("\"This is JSON string\"")
+	ts    int64             = time.Date(2020, time.June, 14, 17, 46, 32, 0, time.UTC).Unix()
+	h     int64             = 0
+	prevH [sha256.Size]byte = sha256.Sum256([]byte("Here goes proper hash of the block"))
+	owner string            = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
 )
 
 func TestNewBlock(t *testing.T) {
@@ -18,7 +20,7 @@ func TestNewBlock(t *testing.T) {
 	{
 		t.Log("\tGiven correct paramerters: ", ts, h, owner, data)
 		{
-			block := NewBlock(ts, h, owner, data)
+			block := NewBlock(ts, h, owner, &prevH, data)
 			if block == nil {
 				t.Fatalf("\t\tShould return new Block, got: nil")
 			}
@@ -42,6 +44,20 @@ func TestNewBlock(t *testing.T) {
 	}
 }
 
+func TestNewBlockNilPrevH(t *testing.T) {
+	t.Log("TestNewBlock")
+	{
+		t.Log("\tGiven nil hash of prev block")
+		{
+			block := NewBlock(ts, h, owner, nil, data)
+			if block.prevHash != nil {
+				t.Fatal("\t\tShould construct valid Block, prevHash should be nil")
+			}
+			t.Log("\t\tShould construct valid Block")
+		}
+	}
+}
+
 func TestNewBlockBadTS(t *testing.T) {
 	t.Log("TestNewBlock")
 	{
@@ -56,7 +72,7 @@ func TestNewBlockBadTS(t *testing.T) {
 				}
 				t.Fatal("\t\tShould panic but got nil instead")
 			}()
-			_ = NewBlock(badTS, h, owner, data)
+			_ = NewBlock(badTS, h, owner, &prevH, data)
 		}
 	}
 }
@@ -75,7 +91,7 @@ func TestNewBlockBadHeight(t *testing.T) {
 				}
 				t.Fatal("\t\tShould panic but got nil instead")
 			}()
-			_ = NewBlock(ts, badHeight, owner, data)
+			_ = NewBlock(ts, badHeight, owner, &prevH, data)
 		}
 	}
 }
@@ -86,7 +102,7 @@ func TestGetData(t *testing.T) {
 		data := []byte("\"This is random JSON string\"")
 		t.Logf("\tGiven a block with data (%s)", data)
 		{
-			block := NewBlock(ts, h, owner, data)
+			block := NewBlock(ts, h, owner, &prevH, data)
 			actual := block.GetData()
 
 			if string(actual) != string(data) {
@@ -102,7 +118,7 @@ func TestValidate(t *testing.T) {
 	{
 		t.Logf("\tGiven a block without data (nil)")
 		{
-			block := NewBlock(ts, h, owner, nil)
+			block := NewBlock(ts, h, owner, &prevH, nil)
 			isValid := block.Validate()
 			if !isValid {
 				t.Fatalf("\t\tShould return true, got: %v", isValid)
@@ -112,7 +128,7 @@ func TestValidate(t *testing.T) {
 		data := []byte("\"This is original data\"")
 		t.Logf("\tGiven a block with data (%s)", data)
 		{
-			block := NewBlock(ts, h, owner, data)
+			block := NewBlock(ts, h, owner, &prevH, data)
 			isValid := block.Validate()
 			if !isValid {
 				t.Fatalf("\t\tShould return true, got: %v", isValid)
@@ -123,7 +139,7 @@ func TestValidate(t *testing.T) {
 		{
 			t.Log("\t\tWhen data was changed")
 			{
-				block := NewBlock(ts, h, owner, data)
+				block := NewBlock(ts, h, owner, &prevH, data)
 				block.data = []byte(string(data) + " Not this time!")
 				isValid := block.Validate()
 				if isValid {
@@ -136,7 +152,7 @@ func TestValidate(t *testing.T) {
 		{
 			t.Log("\t\tWhen ts was changed")
 			{
-				block := NewBlock(ts, h, owner, data)
+				block := NewBlock(ts, h, owner, &prevH, data)
 				block.ts = 1
 				isValid := block.Validate()
 				if isValid {
@@ -149,7 +165,7 @@ func TestValidate(t *testing.T) {
 		{
 			t.Log("\t\tWhen height was changed")
 			{
-				block := NewBlock(ts, h, owner, data)
+				block := NewBlock(ts, h, owner, &prevH, data)
 				block.height = h + 11
 				isValid := block.Validate()
 				if isValid {

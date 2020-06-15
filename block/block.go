@@ -12,11 +12,12 @@ import (
 // It consists of timestamp (ts), height, address of the owner's wallet,
 // data encoded as []byte of hex values, and SHA256 hash of the block.
 type Block struct {
-	ts     int64
-	height int64
-	owner  string
-	data   []byte
-	hash   [sha256.Size]byte
+	ts       int64
+	height   int64
+	owner    string
+	prevHash *[sha256.Size]byte
+	data     []byte
+	hash     [sha256.Size]byte
 }
 
 var (
@@ -28,7 +29,7 @@ var (
 // NewBlock fn creates a brand new Block.
 // It panics when timestamp is less than or equal 0.
 // It panics when height is negative.
-func NewBlock(ts int64, height int64, owner string, data []byte) *Block {
+func NewBlock(ts int64, height int64, owner string, prevHash *[sha256.Size]byte, data []byte) *Block {
 	if ts <= 0 {
 		log.Panic(WrongTimeStampErr, ts)
 	}
@@ -45,6 +46,7 @@ func NewBlock(ts int64, height int64, owner string, data []byte) *Block {
 	hash := block.CalculateHash()
 	block.hash = hash
 	block.owner = owner
+	block.prevHash = prevHash
 	return &block
 }
 
