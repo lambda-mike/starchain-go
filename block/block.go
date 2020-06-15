@@ -9,11 +9,12 @@ import (
 )
 
 // Block struct represents single block in the blockchain.
-// It consists of timestamp (ts), height, data encoded as []byte of hex values,
-// SHA256 hash of the block.
+// It consists of timestamp (ts), height, address of the owner's wallet,
+// data encoded as []byte of hex values, and SHA256 hash of the block.
 type Block struct {
 	ts     int64
 	height int64
+	owner  string
 	data   []byte
 	hash   [sha256.Size]byte
 }
@@ -24,10 +25,10 @@ var (
 )
 
 // TODO add prevHash
-// TODO add owner
-// NewBlock creates new Block.
+// NewBlock fn creates a brand new Block.
 // It panics when timestamp is less than or equal 0.
-func NewBlock(ts int64, height int64, data []byte) *Block {
+// It panics when height is negative.
+func NewBlock(ts int64, height int64, owner string, data []byte) *Block {
 	if ts <= 0 {
 		log.Panic(WrongTimeStampErr, ts)
 	}
@@ -43,6 +44,7 @@ func NewBlock(ts int64, height int64, data []byte) *Block {
 	}
 	hash := block.CalculateHash()
 	block.hash = hash
+	block.owner = owner
 	return &block
 }
 
@@ -58,7 +60,7 @@ func (b *Block) CalculateHash() [sha256.Size]byte {
 	return sha256.Sum256([]byte(blockFields))
 }
 
-// GetData method returns data stored inside block decoded from hex
+// GetData method returns data stored inside a block decoded from hex
 func (b *Block) GetData() []byte {
 	decoded := make([]byte, hex.DecodedLen(len(b.data)))
 	hex.Decode(decoded, b.data)
