@@ -5,6 +5,7 @@ package blockchain
 import (
 	"crypto/sha256"
 	"github.com/starchain/block"
+	"sync"
 	"time"
 )
 
@@ -14,20 +15,34 @@ import (
 // getting block by id
 type Blockchain struct {
 	chain []*block.Block
-	// TODO mutex
+	mutex sync.RWMutex
 }
 
 // Factory function returning new Blockchain
 func New() *Blockchain {
 	var (
-		blockchain                    = Blockchain{[]*block.Block{}}
+		blockchain Blockchain
 		prevHash   *[sha256.Size]byte = nil
 	)
 	ts := time.Now().Unix()
-	height := int64(len(blockchain.chain))
+	height := len(blockchain.chain)
 	owner := ""
 	data := []byte("Genesis Gopher Block")
 	genesisBlock := block.New(ts, height, owner, prevHash, data)
 	blockchain.chain = append(blockchain.chain, genesisBlock)
 	return &blockchain
 }
+
+func (b *Blockchain) GetChainHeight() int {
+	b.mutex.RLock()
+	height := len(b.chain)
+	b.mutex.RUnlock()
+	return height
+}
+
+// TODO ValidateChain
+// TODO RequestMessageOwnershipVerification
+// TODO SubmitStar
+// TODO GetBlockByHash
+// TODO GetBlockByHeight
+// TODO GetStarsByWalletAddress

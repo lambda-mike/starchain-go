@@ -26,3 +26,20 @@ func TestNew(t *testing.T) {
 		}
 	}
 }
+
+func TestGetChainHeight(t *testing.T) {
+	t.Log("TestGetChainHeight")
+	{
+		t.Log("\tGiven fresh blockchain")
+		{
+			blockchain := New()
+			height := blockchain.GetChainHeight()
+			if height != 1 {
+				t.Fatalf("\t\tShould return 1, got: %v", height)
+			}
+			t.Log("\t\tShould return 1")
+		}
+		// TODO add block, test height
+		// TODO add and get blocks in parallel
+	}
+}
