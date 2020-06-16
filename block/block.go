@@ -78,6 +78,11 @@ func (b *Block) GetData() []byte {
 	return decoded
 }
 
+// GetOwner method returns owner stored inside a block
+func (b *Block) GetOwner() string {
+	return b.owner
+}
+
 // Validate method checks whether block was tampered with.
 // It does so by calculating the hash of the block without hash field and
 // comparing the result with the hash stored in that block.
