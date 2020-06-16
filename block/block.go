@@ -26,10 +26,10 @@ var (
 	NegativeHeightErr error = errors.New("Height must be greater than or equal 0")
 )
 
-// NewBlock fn creates a brand new Block.
+// New fn creates a brand new Block.
 // It panics when timestamp is less than or equal 0.
 // It panics when height is negative.
-func NewBlock(ts int64, height int64, owner string, prevHash *[sha256.Size]byte, data []byte) *Block {
+func New(ts int64, height int64, owner string, prevHash *[sha256.Size]byte, data []byte) *Block {
 	if ts <= 0 {
 		log.Panic(WrongTimeStampErr, ts)
 	}

@@ -15,12 +15,12 @@ var (
 	owner string            = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
 )
 
-func TestNewBlock(t *testing.T) {
-	t.Log("TestNewBlock")
+func TestNew(t *testing.T) {
+	t.Log("TestNew")
 	{
 		t.Log("\tGiven correct paramerters: ", ts, h, owner, data)
 		{
-			block := NewBlock(ts, h, owner, &prevH, data)
+			block := New(ts, h, owner, &prevH, data)
 			if block == nil {
 				t.Fatalf("\t\tShould return new Block, got: nil")
 			}
@@ -63,12 +63,12 @@ func TestNewBlock(t *testing.T) {
 	}
 }
 
-func TestNewBlockNilPrevH(t *testing.T) {
-	t.Log("TestNewBlock")
+func TestNewNilPrevH(t *testing.T) {
+	t.Log("TestNew")
 	{
 		t.Log("\tGiven nil hash of prev block")
 		{
-			block := NewBlock(ts, h, owner, nil, data)
+			block := New(ts, h, owner, nil, data)
 			if block.prevHash != nil {
 				t.Fatal("\t\tShould construct valid Block, prevHash should be nil")
 			}
@@ -77,8 +77,8 @@ func TestNewBlockNilPrevH(t *testing.T) {
 	}
 }
 
-func TestNewBlockBadTS(t *testing.T) {
-	t.Log("TestNewBlock")
+func TestNewBadTS(t *testing.T) {
+	t.Log("TestNew")
 	{
 		var badTS int64 = 0
 		t.Log("\tGiven incorrect timestamp", badTS)
@@ -91,13 +91,13 @@ func TestNewBlockBadTS(t *testing.T) {
 				}
 				t.Fatal("\t\tShould panic but got nil instead")
 			}()
-			_ = NewBlock(badTS, h, owner, &prevH, data)
+			_ = New(badTS, h, owner, &prevH, data)
 		}
 	}
 }
 
-func TestNewBlockBadHeight(t *testing.T) {
-	t.Log("TestNewBlock")
+func TestNewBadHeight(t *testing.T) {
+	t.Log("TestNew")
 	{
 		var badHeight int64 = -1
 		t.Log("\tGiven incorrect height", badHeight)
@@ -110,7 +110,7 @@ func TestNewBlockBadHeight(t *testing.T) {
 				}
 				t.Fatal("\t\tShould panic but got nil instead")
 			}()
-			_ = NewBlock(ts, badHeight, owner, &prevH, data)
+			_ = New(ts, badHeight, owner, &prevH, data)
 		}
 	}
 }
@@ -121,7 +121,7 @@ func TestGetData(t *testing.T) {
 		data := []byte("\"This is random JSON string\"")
 		t.Logf("\tGiven a block with data (%s)", data)
 		{
-			block := NewBlock(ts, h, owner, &prevH, data)
+			block := New(ts, h, owner, &prevH, data)
 			actual := block.GetData()
 
 			if string(actual) != string(data) {
@@ -137,7 +137,7 @@ func TestValidate(t *testing.T) {
 	{
 		t.Logf("\tGiven a block without data (nil)")
 		{
-			block := NewBlock(ts, h, owner, &prevH, nil)
+			block := New(ts, h, owner, &prevH, nil)
 			isValid := block.Validate()
 			if !isValid {
 				t.Fatalf("\t\tShould return true, got: %v", isValid)
@@ -147,7 +147,7 @@ func TestValidate(t *testing.T) {
 		data := []byte("\"This is original data\"")
 		t.Logf("\tGiven a block with data (%s)", data)
 		{
-			block := NewBlock(ts, h, owner, &prevH, data)
+			block := New(ts, h, owner, &prevH, data)
 			isValid := block.Validate()
 			if !isValid {
 				t.Fatalf("\t\tShould return true, got: %v", isValid)
@@ -158,7 +158,7 @@ func TestValidate(t *testing.T) {
 		{
 			t.Log("\t\tWhen data was changed")
 			{
-				block := NewBlock(ts, h, owner, &prevH, data)
+				block := New(ts, h, owner, &prevH, data)
 				block.data = []byte(string(data) + " Not this time!")
 				isValid := block.Validate()
 				if isValid {
@@ -171,7 +171,7 @@ func TestValidate(t *testing.T) {
 		{
 			t.Log("\t\tWhen ts was changed")
 			{
-				block := NewBlock(ts, h, owner, &prevH, data)
+				block := New(ts, h, owner, &prevH, data)
 				block.ts = 1
 				isValid := block.Validate()
 				if isValid {
@@ -184,7 +184,7 @@ func TestValidate(t *testing.T) {
 		{
 			t.Log("\t\tWhen height was changed")
 			{
-				block := NewBlock(ts, h, owner, &prevH, data)
+				block := New(ts, h, owner, &prevH, data)
 				block.height = h + 11
 				isValid := block.Validate()
 				if isValid {
@@ -197,7 +197,7 @@ func TestValidate(t *testing.T) {
 		{
 			t.Log("\t\tWhen owner was changed")
 			{
-				block := NewBlock(ts, h, owner, &prevH, data)
+				block := New(ts, h, owner, &prevH, data)
 				block.owner += "boom!"
 				isValid := block.Validate()
 				if isValid {
@@ -210,7 +210,7 @@ func TestValidate(t *testing.T) {
 		{
 			t.Log("\t\tWhen prevHash was changed")
 			{
-				block := NewBlock(ts, h, owner, &prevH, data)
+				block := New(ts, h, owner, &prevH, data)
 				block.prevHash[2] = 22
 				isValid := block.Validate()
 				if isValid {
