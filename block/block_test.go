@@ -10,7 +10,7 @@ import (
 var (
 	data  []byte            = []byte("\"This is JSON string\"")
 	ts    int64             = time.Date(2020, time.June, 14, 17, 46, 32, 0, time.UTC).Unix()
-	h     int64             = 7
+	h     int               = 7
 	prevH [sha256.Size]byte = sha256.Sum256([]byte("Here goes proper hash of the block"))
 	owner string            = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
 )
@@ -99,7 +99,7 @@ func TestNewBadTS(t *testing.T) {
 func TestNewBadHeight(t *testing.T) {
 	t.Log("TestNew")
 	{
-		var badHeight int64 = -1
+		var badHeight int = -1
 		t.Log("\tGiven incorrect height", badHeight)
 		{
 			defer func() {

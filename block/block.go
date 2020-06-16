@@ -14,7 +14,7 @@ import (
 // and SHA256 hash of the block.
 type Block struct {
 	ts       int64
-	height   int64
+	height   int
 	owner    string
 	prevHash *[sha256.Size]byte
 	data     []byte
@@ -29,7 +29,7 @@ var (
 // New fn creates a brand new Block.
 // It panics when timestamp is less than or equal 0.
 // It panics when height is negative.
-func New(ts int64, height int64, owner string, prevHash *[sha256.Size]byte, data []byte) *Block {
+func New(ts int64, height int, owner string, prevHash *[sha256.Size]byte, data []byte) *Block {
 	if ts <= 0 {
 		log.Panic(WrongTimeStampErr, ts)
 	}
