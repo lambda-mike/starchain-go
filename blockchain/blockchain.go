@@ -4,6 +4,8 @@ package blockchain
 
 import (
 	"crypto/sha256"
+	"errors"
+	"fmt"
 	"github.com/starchain/block"
 	"sync"
 	"time"
@@ -17,6 +19,10 @@ type Blockchain struct {
 	chain []*block.Block
 	mutex sync.RWMutex
 }
+
+var (
+	EmptyAddrErr = errors.New("Address is empty")
+)
 
 // Factory function returning new Blockchain
 func New() *Blockchain {
@@ -41,7 +47,15 @@ func (b *Blockchain) GetChainHeight() int {
 }
 
 // TODO ValidateChain
-// TODO RequestMessageOwnershipVerification
+
+func RequestMessageOwnershipVerification(addr string) (string, error) {
+	if addr == "" {
+		return "", EmptyAddrErr
+	}
+	ts := time.Now().Unix()
+	return fmt.Sprintf("%s:%d:starRegistry", addr, ts), nil
+}
+
 // TODO SubmitStar
 // TODO GetBlockByHash
 // TODO GetBlockByHeight

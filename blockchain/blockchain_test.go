@@ -1,6 +1,8 @@
 package blockchain
 
 import (
+	"fmt"
+	"regexp"
 	"testing"
 )
 
@@ -41,5 +43,36 @@ func TestGetChainHeight(t *testing.T) {
 		}
 		// TODO add block, test height
 		// TODO add and get blocks in parallel
+	}
+}
+
+func TestRequestMessageOwnershipVerification(t *testing.T) {
+	t.Log("RequestMessageOwnershipVerification")
+	{
+		t.Log("\tGiven correct wallet address")
+		{
+			var addr = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
+			msg, err := RequestMessageOwnershipVerification(addr)
+			if err != nil {
+				t.Fatal("\t\tShould return nil error, got: ", err)
+			}
+			regex := fmt.Sprintf("%s:\\d{10,}:starRegistry", addr)
+			if matched, _ := regexp.MatchString(regex, msg); !matched {
+				t.Fatal("\t\tShould return correct message, got: ", msg)
+			}
+			t.Log("\t\tShould return correct message")
+		}
+		t.Log("\tGiven empty wallet address")
+		{
+			var addr = ""
+			msg, err := RequestMessageOwnershipVerification(addr)
+			if err != EmptyAddrErr {
+				t.Fatal("\t\tShould return error, got: ", err)
+			}
+			if "" != msg {
+				t.Fatal("\t\tShould return empty message, got: ", msg)
+			}
+			t.Log("\t\tShould return empty error")
+		}
 	}
 }
