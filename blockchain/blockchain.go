@@ -20,6 +20,13 @@ type Blockchain struct {
 	mutex sync.RWMutex
 }
 
+type StarRequest struct {
+	Addr     string
+	Msg      string
+	StarData []byte
+	Sig      string
+}
+
 var (
 	EmptyAddrErr = errors.New("Address is empty")
 )
@@ -56,7 +63,10 @@ func RequestMessageOwnershipVerification(addr string) (string, error) {
 	return fmt.Sprintf("%s:%d:starRegistry", addr, ts), nil
 }
 
-// TODO SubmitStar
+func (b *Blockchain) SubmitStar(req StarRequest) (*block.Block, error) {
+	return nil, nil
+}
+
 // TODO GetBlockByHash
 // TODO GetBlockByHeight
 // TODO GetStarsByWalletAddress

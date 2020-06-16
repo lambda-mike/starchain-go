@@ -76,3 +76,46 @@ func TestRequestMessageOwnershipVerification(t *testing.T) {
 		}
 	}
 }
+
+func TestSubmitStar(t *testing.T) {
+	t.Log("SubmitStar")
+	{
+		var (
+			addr = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
+			msg  = "TODO msg"
+			star = []byte("TODO star")
+			sig  = "TODO sig"
+			req  = StarRequest{addr, msg, star, sig}
+		)
+		t.Log("\tGiven correct params")
+		{
+			blockchain := New()
+			block, err := blockchain.SubmitStar(req)
+			if err != nil {
+				t.Fatal("\t\tShould return block without errors, got err: ", err)
+			}
+			if bData := block.GetData(); string(bData) != string(star) {
+				t.Fatal("\t\tShould return block with original data, got: ", bData)
+			}
+			if bOwner := block.GetOwner(); bOwner != addr {
+				t.Fatal("\t\tShould return block with correct owner, got: ", bOwner)
+			}
+			if bHeight := block.GetHeight(); bHeight != 1 {
+				t.Fatal("\t\tShould return block with correct height, got: ", bHeight)
+			}
+			// TODO prevHash?
+			if bHeight := len(blockchain.chain); bHeight != 2 {
+				t.Fatal("\t\tShould add block to the chain so it is 2 items long, got: ", bHeight)
+			}
+			prevH := blockchain.chain[1].GetPrevHash()
+			genesisH := blockchain.chain[0].CalculateHash()
+			if prevH != genesisH {
+				t.Fatal("\t\tShould chain blocks together, got wrong prevHash: ",
+					prevH,
+					"\ninstead of: ",
+					genesisH)
+			}
+			t.Log("\t\tShould return correct block and add it to the blockchain")
+		}
+	}
+}

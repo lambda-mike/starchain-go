@@ -83,6 +83,18 @@ func (b *Block) GetOwner() string {
 	return b.owner
 }
 
+// GetHeight method returns height of the block
+func (b *Block) GetHeight() int {
+	return b.height
+}
+
+// GetPrevHash method returns prevHash field value
+func (b *Block) GetPrevHash() [sha256.Size]byte {
+	var hash [sha256.Size]byte
+	copy(hash[:], b.prevHash[:])
+	return hash
+}
+
 // Validate method checks whether block was tampered with.
 // It does so by calculating the hash of the block without hash field and
 // comparing the result with the hash stored in that block.
