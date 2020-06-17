@@ -3,6 +3,7 @@ package block
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"testing"
 	"time"
 )
@@ -142,6 +143,22 @@ func TestGetOwner(t *testing.T) {
 				t.Fatalf("\t\tShould return the same owner, got: (%s)", actual)
 			}
 			t.Logf("\t\tShould return the same owner")
+		}
+	}
+}
+
+func TestGetHash(t *testing.T) {
+	t.Log("GetHash")
+	{
+		t.Log("\tGiven a new block")
+		{
+			block := New(ts, h, owner, &prevH, data)
+			actual := block.GetHash()
+			expected := "1719936683df2bda7a32acaef246c6fecbdf34890ebdbc5a105bab851f05e47b"
+			if fmt.Sprintf("%x", actual) != expected {
+				t.Fatalf("\t\tShould return correct hash:\n%s, got:\n%x", expected, actual)
+			}
+			t.Logf("\t\tShould return the same hash")
 		}
 	}
 }

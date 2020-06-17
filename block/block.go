@@ -95,6 +95,13 @@ func (b *Block) GetPrevHash() [sha256.Size]byte {
 	return hash
 }
 
+// GetHash method returns hash field value
+func (b *Block) GetHash() [sha256.Size]byte {
+	var h [sha256.Size]byte
+	copy(h[:], b.hash[:])
+	return h
+}
+
 // Validate method checks whether block was tampered with.
 // It does so by calculating the hash of the block without hash field and
 // comparing the result with the hash stored in that block.
