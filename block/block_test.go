@@ -178,6 +178,21 @@ func TestGetPrevHash(t *testing.T) {
 	}
 }
 
+func TestGetHeight(t *testing.T) {
+	t.Log("GetHeight")
+	{
+		t.Log("\tGiven a new block")
+		{
+			block := New(ts, h, owner, &prevH, data)
+			actual := block.GetHeight()
+			if actual != h {
+				t.Fatalf("\t\tShould return correct height:\n%d, got:\n%d", h, actual)
+			}
+			t.Logf("\t\tShould return correct height")
+		}
+	}
+}
+
 func TestValidate(t *testing.T) {
 	t.Log("Validate")
 	{
