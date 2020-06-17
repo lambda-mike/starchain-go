@@ -123,11 +123,25 @@ func TestGetData(t *testing.T) {
 		{
 			block := New(ts, h, owner, &prevH, data)
 			actual := block.GetData()
-
 			if string(actual) != string(data) {
 				t.Fatalf("\t\tShould return the same data, got: (%s)", actual)
 			}
 			t.Logf("\t\tShould return the same data")
+		}
+	}
+}
+
+func TestGetOwner(t *testing.T) {
+	t.Log("GetOwner")
+	{
+		t.Log("\tGiven a new block")
+		{
+			block := New(ts, h, owner, &prevH, data)
+			actual := block.GetOwner()
+			if actual != owner {
+				t.Fatalf("\t\tShould return the same owner, got: (%s)", actual)
+			}
+			t.Logf("\t\tShould return the same owner")
 		}
 	}
 }
