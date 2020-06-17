@@ -163,6 +163,21 @@ func TestGetHash(t *testing.T) {
 	}
 }
 
+func TestGetPrevHash(t *testing.T) {
+	t.Log("GetPrevHash")
+	{
+		t.Log("\tGiven a new block")
+		{
+			block := New(ts, h, owner, &prevH, data)
+			actual := block.GetPrevHash()
+			if fmt.Sprintf("%x", actual) != fmt.Sprintf("%x", prevH) {
+				t.Fatalf("\t\tShould return correct hash:\n%x, got:\n%x", prevH, actual)
+			}
+			t.Logf("\t\tShould return correct prevHash")
+		}
+	}
+}
+
 func TestValidate(t *testing.T) {
 	t.Log("Validate")
 	{
