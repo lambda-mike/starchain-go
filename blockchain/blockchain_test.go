@@ -2,16 +2,23 @@ package blockchain
 
 import (
 	"fmt"
-	"regexp"
 	"testing"
+	"time"
 )
+
+type BlockchainClockMock struct{}
+
+func (b BlockchainClockMock) GetTime() int64 {
+	return time.Date(2020, time.June, 14, 17, 46, 32, 0, time.UTC).Unix()
+}
 
 func TestNew(t *testing.T) {
 	t.Log("TestNew")
 	{
 		t.Log("\tWhen called")
 		{
-			blockchain := New()
+			clock := BlockchainClockMock{}
+			blockchain := New(clock)
 			if blockchain == nil {
 				t.Fatalf("\t\tShould return new Blockchain, got:\nnil")
 			}
@@ -34,7 +41,8 @@ func TestGetChainHeight(t *testing.T) {
 	{
 		t.Log("\tGiven fresh blockchain")
 		{
-			blockchain := New()
+			clock := BlockchainClockMock{}
+			blockchain := New(clock)
 			height := blockchain.GetChainHeight()
 			if height != 1 {
 				t.Fatalf("\t\tShould return 1, got: %v", height)
@@ -51,21 +59,25 @@ func TestRequestMessageOwnershipVerification(t *testing.T) {
 	{
 		t.Log("\tGiven correct wallet address")
 		{
+			clock := BlockchainClockMock{}
+			blockchain := New(clock)
 			var addr = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
-			msg, err := RequestMessageOwnershipVerification(addr)
+			msg, err := blockchain.RequestMessageOwnershipVerification(addr)
 			if err != nil {
 				t.Fatal("\t\tShould return nil error, got: ", err)
 			}
-			regex := fmt.Sprintf("%s:\\d{10,}:starRegistry", addr)
-			if matched, _ := regexp.MatchString(regex, msg); !matched {
+			expected := fmt.Sprintf("%s:%d:starRegistry", addr, 1592156792)
+			if expected != msg {
 				t.Fatal("\t\tShould return correct message, got: ", msg)
 			}
 			t.Log("\t\tShould return correct message")
 		}
 		t.Log("\tGiven empty wallet address")
 		{
+			clock := BlockchainClockMock{}
+			blockchain := New(clock)
 			var addr = ""
-			msg, err := RequestMessageOwnershipVerification(addr)
+			msg, err := blockchain.RequestMessageOwnershipVerification(addr)
 			if err != EmptyAddrErr {
 				t.Fatal("\t\tShould return error, got: ", err)
 			}
@@ -89,7 +101,8 @@ func TestSubmitStar(t *testing.T) {
 		)
 		t.Log("\tGiven correct params")
 		{
-			blockchain := New()
+			clock := BlockchainClockMock{}
+			blockchain := New(clock)
 			block, err := blockchain.SubmitStar(req)
 			if err != nil {
 				t.Fatal("\t\tShould return block without errors, got err: ", err)

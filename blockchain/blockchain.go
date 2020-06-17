@@ -18,8 +18,11 @@ import (
 type Blockchain struct {
 	chain []*block.Block
 	mutex sync.RWMutex
+	clock Clock
 }
 
+// StarRequest struct contains all data requiered to create a new star
+// in the blockchain.
 type StarRequest struct {
 	Addr     string
 	Msg      string
@@ -27,22 +30,33 @@ type StarRequest struct {
 	Sig      string
 }
 
+type Clock interface {
+	GetTime() int64
+}
+
+type BlockchainClock struct{}
+
+func (b BlockchainClock) GetTime() int64 {
+	return time.Now().Unix()
+}
+
 var (
 	EmptyAddrErr = errors.New("Address is empty")
 )
 
 // Factory function returning new Blockchain
-func New() *Blockchain {
+func New(clock Clock) *Blockchain {
 	var (
 		blockchain Blockchain
 		prevHash   *[sha256.Size]byte = nil
 	)
-	ts := time.Now().Unix()
+	ts := clock.GetTime()
 	height := len(blockchain.chain)
 	owner := ""
 	data := []byte("Genesis Gopher Block")
 	genesisBlock := block.New(ts, height, owner, prevHash, data)
 	blockchain.chain = append(blockchain.chain, genesisBlock)
+	blockchain.clock = clock
 	return &blockchain
 }
 
@@ -55,11 +69,13 @@ func (b *Blockchain) GetChainHeight() int {
 
 // TODO ValidateChain
 
-func RequestMessageOwnershipVerification(addr string) (string, error) {
+func (b *Blockchain) RequestMessageOwnershipVerification(addr string) (string, error) {
 	if addr == "" {
 		return "", EmptyAddrErr
 	}
-	ts := time.Now().Unix()
+	b.mutex.RLock()
+	ts := b.clock.GetTime()
+	b.mutex.RUnlock()
 	return fmt.Sprintf("%s:%d:starRegistry", addr, ts), nil
 }
 
