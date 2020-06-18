@@ -121,7 +121,7 @@ func TestSubmitStar(t *testing.T) {
 				t.Fatal("\t\tShould add block to the chain so it is 2 items long, got: ", bHeight)
 			}
 			prevH := blockchain.chain[1].GetPrevHash()
-			genesisH := blockchain.chain[0].CalculateHash()
+			genesisH := blockchain.chain[0].GetHash()
 			if prevH != genesisH {
 				t.Fatal("\t\tShould chain blocks together, got wrong prevHash: ",
 					prevH,
