@@ -94,7 +94,7 @@ func TestSubmitStar(t *testing.T) {
 	{
 		var (
 			addr = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
-			msg  = "TODO msg"
+			msg  = fmt.Sprintf("%s:%d:starRegistry", addr, 1592156792-3*60)
 			star = []byte("TODO star")
 			sig  = "TODO sig"
 			req  = StarRequest{addr, msg, star, sig}
@@ -129,6 +129,53 @@ func TestSubmitStar(t *testing.T) {
 					genesisH)
 			}
 			t.Log("\t\tShould return correct block and add it to the blockchain")
+		}
+	}
+}
+
+func TestIsMessageOutdated(t *testing.T) {
+	t.Log("IsMessageOutdated")
+	{
+		var addr = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
+		t.Log("\tGiven correct message")
+		{
+			msg := fmt.Sprintf("%s:%d:starRegistry", addr, 1592156792-3*60)
+			clock := BlockchainClockMock{}
+			blockchain := New(clock)
+			isOutdated, err := blockchain.IsMessageOutdated(addr, msg)
+			if err != nil {
+				t.Fatal("\t\tShould return false and nil err, got err: ", err)
+			}
+			if isOutdated {
+				t.Fatal("\t\tShould return false, got: ", isOutdated)
+			}
+			t.Log("\t\tShould return false")
+		}
+		t.Log("\tGiven outdated message")
+		{
+			msg := fmt.Sprintf("%s:%d:starRegistry", addr, 1592156792-5*60)
+			clock := BlockchainClockMock{}
+			blockchain := New(clock)
+			isOutdated, err := blockchain.IsMessageOutdated(addr, msg)
+			if !isOutdated {
+				t.Fatal("\t\tShould return true, got", isOutdated)
+			}
+			if err != nil {
+				t.Fatal("\t\tShould return true and nil err, got err: ", err)
+			}
+			t.Log("\t\tShould return true")
+		}
+		t.Log("\tGiven malformed message")
+		{
+			// Message from the future
+			msg := fmt.Sprintf("%s:%d:starRegistry", addr, 1592156792+5*60)
+			clock := BlockchainClockMock{}
+			blockchain := New(clock)
+			_, err := blockchain.IsMessageOutdated(addr, msg)
+			if err == nil {
+				t.Fatal("\t\tShould return err, got nil")
+			}
+			t.Log("\t\tShould return err: ", err)
 		}
 	}
 }

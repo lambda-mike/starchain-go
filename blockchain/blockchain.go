@@ -2,11 +2,15 @@
 // It depends on block package
 package blockchain
 
+// TODO add logging
+
 import (
 	"crypto/sha256"
 	"errors"
 	"fmt"
 	"github.com/starchain/block"
+	"regexp"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -36,6 +40,8 @@ type Clock interface {
 
 type BlockchainClock struct{}
 
+const FIVE_MIN int64 = 5 * 60
+
 func (b BlockchainClock) GetTime() int64 {
 	return time.Now().Unix()
 }
@@ -44,7 +50,7 @@ var (
 	EmptyAddrErr       = errors.New("Address is empty")
 	EmptyMsgErr        = errors.New("Message is empty")
 	EmptySigErr        = errors.New("Signature is empty")
-	WrongTSErr         = errors.New("Message is outdated - wrong timestamp")
+	WrongTSErr         = errors.New("Message is not within allowed time range")
 	MsgSigMistmatchErr = errors.New("Message does not match the signature")
 )
 
@@ -84,9 +90,23 @@ func (b *Blockchain) RequestMessageOwnershipVerification(addr string) (string, e
 	return fmt.Sprintf("%s:%d:starRegistry", addr, ts), nil
 }
 
-func (b *Blockchain) IsMessageOutdated(msg string) bool {
-	// TODO
-	return true
+func (b *Blockchain) IsMessageOutdated(addr string, msg string) (bool, error) {
+	regex := regexp.MustCompile(fmt.Sprintf("%s:(\\d{10,}):starRegistry", addr))
+	if chunks := regex.FindStringSubmatch(msg); len(chunks) != 2 {
+		return false, errors.New(fmt.Sprintf("Message %s is mlaformed", msg))
+	} else if ts, err := strconv.ParseInt(chunks[1], 10, 64); err != nil {
+		return false, errors.New(fmt.Sprintf("Chunk %v is not a number", chunks[1]))
+	} else {
+		b.mutex.RLock()
+		now := b.clock.GetTime()
+		b.mutex.RUnlock()
+		duration := now - ts
+		if duration < 0 {
+			return true, WrongTSErr
+		}
+		return duration >= FIVE_MIN, nil
+	}
+	return true, errors.New("Undetermined result for timestamp checking")
 }
 
 func (b *Blockchain) AddBlock(owner string, starData []byte) *block.Block {
@@ -113,7 +133,11 @@ func (b *Blockchain) SubmitStar(req StarRequest) (*block.Block, error) {
 	if req.Sig == "" {
 		return nil, EmptySigErr
 	}
-	if b.IsMessageOutdated(req.Msg) {
+	isOutdated, err := b.IsMessageOutdated(req.Addr, req.Msg)
+	if err != nil {
+		return nil, err
+	}
+	if isOutdated {
 		return nil, WrongTSErr
 	}
 	if !VerifyMessage(req) {
