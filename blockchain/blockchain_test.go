@@ -200,5 +200,21 @@ func TestGetBlockByHash(t *testing.T) {
 			t.Log("\t\tShould return not nil err")
 		}
 	}
+	t.Log("\tGiven genesis block hash")
+	{
+		clock := BlockchainClockMock{}
+		blockchain := New(clock)
+		hash := blockchain.chain[0].GetHash()
+		block, err := blockchain.GetBlockByHash(hash)
+
+		if block == nil {
+			t.Fatal("\t\tShould return genesis block, got: ", block)
+		}
+		t.Log("\t\tShould return genesis block")
+		if err != nil {
+			t.Fatal("\t\tShould not return err, got: ", err)
+		}
+		t.Log("\t\tShould return genesis block")
+	}
 	// TODO
 }
