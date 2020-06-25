@@ -153,5 +153,9 @@ func (b *Blockchain) GetBlockByHash(hash [sha256.Size]byte) (*block.Block, error
 	return nil, errors.New(fmt.Sprintf("Block %x not found", hash))
 }
 
-// TODO GetBlockByHeight
+func (b *Blockchain) GetBlockByHeight(height int) (*block.Block, error) {
+	return nil, errors.New(fmt.Sprintf("Block at pos %v not found", height))
+}
+
 // TODO GetStarsByWalletAddress
+// TODO ValidateChain

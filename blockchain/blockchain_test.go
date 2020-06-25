@@ -241,3 +241,78 @@ func TestGetBlockByHash(t *testing.T) {
 		t.Log("\t\tShould return new block")
 	}
 }
+
+func TestGetBlockByHeight(t *testing.T) {
+	t.Log("GetBlockByHeight")
+	{
+		t.Log("\tGiven height -1")
+		{
+			clock := BlockchainClockMock{}
+			blockchain := New(clock)
+			block, err := blockchain.GetBlockByHeight(0)
+
+			if block != nil {
+				t.Fatal("\t\tShould return nil, got: ")
+			}
+			t.Log("\t\tShould return nil")
+			if err == nil {
+				t.Fatal("\t\tShould return not nil err, got: ", err)
+			}
+			t.Log("\t\tShould return not nil err:", err)
+		}
+		t.Log("\tGiven height bigger than chain len")
+		{
+			clock := BlockchainClockMock{}
+			blockchain := New(clock)
+			block, err := blockchain.GetBlockByHeight(1)
+
+			if block != nil {
+				t.Fatal("\t\tShould return nil, got: ")
+			}
+			t.Log("\t\tShould return nil")
+			if err == nil {
+				t.Fatal("\t\tShould return not nil err, got: ", err)
+			}
+			t.Log("\t\tShould return not nil err:", err)
+		}
+	}
+	t.Log("\tGiven height 0")
+	{
+		clock := BlockchainClockMock{}
+		blockchain := New(clock)
+		block, err := blockchain.GetBlockByHeight(0)
+
+		if block == nil {
+			t.Fatal("\t\tShould return genesis block, got: ", block)
+		}
+		t.Log("\t\tShould return genesis block")
+		if err != nil {
+			t.Fatal("\t\tShould not return err, got: ", err)
+		}
+		t.Log("\t\tShould return genesis block")
+	}
+	t.Log("\tGiven new block height")
+	{
+		var (
+			addr = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
+			msg  = fmt.Sprintf("%s:%d:starRegistry", addr, 1592156792-3*60)
+			star = []byte("Brand new Star")
+			sig  = "TODO sig"
+			req  = StarRequest{addr, msg, star, sig}
+		)
+		height := 1
+		clock := BlockchainClockMock{}
+		blockchain := New(clock)
+		blockchain.SubmitStar(req)
+		block, err := blockchain.GetBlockByHeight(height)
+
+		if block == nil || block != blockchain.chain[height] {
+			t.Fatal("\t\tShould return new block, got: ", block)
+		}
+		t.Log("\t\tShould return new block")
+		if err != nil {
+			t.Fatal("\t\tShould not return err, got: ", err)
+		}
+		t.Log("\t\tShould return new block")
+	}
+}
