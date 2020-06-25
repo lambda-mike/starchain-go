@@ -145,6 +145,8 @@ func VerifyMessage(req StarRequest) bool {
 }
 
 func (b *Blockchain) GetBlockByHash(hash [sha256.Size]byte) (*block.Block, error) {
+	b.mutex.RLock()
+	defer b.mutex.RUnlock()
 	for _, b := range b.chain {
 		if b.GetHash() == hash {
 			return b, nil
@@ -154,6 +156,8 @@ func (b *Blockchain) GetBlockByHash(hash [sha256.Size]byte) (*block.Block, error
 }
 
 func (b *Blockchain) GetBlockByHeight(height int) (*block.Block, error) {
+	b.mutex.RLock()
+	defer b.mutex.RUnlock()
 	if height < 0 || height >= len(b.chain) {
 		return nil, errors.New(fmt.Sprintf("Invalid height: %v", height))
 	}
@@ -166,6 +170,8 @@ func (b *Blockchain) GetBlockByHeight(height int) (*block.Block, error) {
 }
 
 func (b *Blockchain) GetStarsByWalletAddress(addr string) []*block.Block {
+	b.mutex.RLock()
+	defer b.mutex.RUnlock()
 	var blocks []*block.Block
 	// Ommit genesis block - it has no owner
 	for _, block := range b.chain[1:] {
@@ -177,6 +183,8 @@ func (b *Blockchain) GetStarsByWalletAddress(addr string) []*block.Block {
 }
 
 func (b *Blockchain) ValidateChain() []error {
+	b.mutex.RLock()
+	defer b.mutex.RUnlock()
 	validationErrs := []error{}
 	for i, block := range b.chain {
 		hash := block.GetHash()
