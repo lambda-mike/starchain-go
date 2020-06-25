@@ -316,3 +316,75 @@ func TestGetBlockByHeight(t *testing.T) {
 		t.Log("\t\tShould return new block")
 	}
 }
+
+func TestGetStarsByWalletAddress(t *testing.T) {
+	t.Log("GetStarsByWalletAddress")
+	{
+		t.Log("\tGiven empty address")
+		{
+			clock := BlockchainClockMock{}
+			blockchain := New(clock)
+			blocks := blockchain.GetStarsByWalletAddress("")
+
+			if len(blocks) != 0 {
+				t.Fatal("\t\tShould return empty array, got: ", blocks)
+			}
+			t.Log("\t\tShould return empty array")
+		}
+		t.Log("\tGiven blockchain with the new block")
+		{
+			t.Log("\tWhen proper address passed as param")
+			{
+				var (
+					addr = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
+					msg  = fmt.Sprintf("%s:%d:starRegistry", addr, 1592156792-3*60)
+					star = []byte("Brand new Star")
+					sig  = "TODO sig"
+					req  = StarRequest{addr, msg, star, sig}
+				)
+				clock := BlockchainClockMock{}
+				blockchain := New(clock)
+				blockchain.SubmitStar(req)
+				blocks := blockchain.GetStarsByWalletAddress(addr)
+				if len(blocks) != 1 {
+					t.Fatal("\t\tShould return not empty array, got: ", blocks)
+				}
+				t.Log("\t\tShould return not empty array")
+				if blocks[0].GetOwner() != addr || string(blocks[0].GetData()) != string(star) {
+					t.Fatal("\t\tShould return proper block, got: ", blocks[0])
+				}
+				t.Log("\t\tShould return proper blocks")
+			}
+		}
+		t.Log("\tGiven blockchain with new blocks belonging to different owners")
+		{
+			t.Log("\tWhen second owner's address is passed")
+			{
+				var (
+					addr1 = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
+					addr2 = "1FzpnkhbAteDkU2wXDtd8kKizQhqWcsrWx"
+					msg1  = fmt.Sprintf("%s:%d:starRegistry", addr1, 1592156792-3*60)
+					msg2  = fmt.Sprintf("%s:%d:starRegistry", addr2, 1592156792-2*60)
+					star1 = []byte("Brand new Star 1")
+					star2 = []byte("Brand new Star 2")
+					sig   = "TODO sig"
+					req1  = StarRequest{addr1, msg1, star1, sig}
+					req2  = StarRequest{addr2, msg2, star2, sig}
+				)
+				clock := BlockchainClockMock{}
+				blockchain := New(clock)
+				blockchain.SubmitStar(req1)
+				blockchain.SubmitStar(req2)
+				blocks := blockchain.GetStarsByWalletAddress(addr2)
+				if len(blocks) != 1 {
+					t.Fatal("\t\tShould return not empty array, got: ", blocks)
+				}
+				t.Log("\t\tShould return not empty array")
+				if blocks[0].GetOwner() != addr2 || string(blocks[0].GetData()) != string(star2) {
+					t.Fatal("\t\tShould return proper block, got: ", blocks[0])
+				}
+				t.Log("\t\tShould return proper blocks")
+			}
+		}
+	}
+}
