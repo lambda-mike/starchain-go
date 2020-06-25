@@ -154,6 +154,14 @@ func (b *Blockchain) GetBlockByHash(hash [sha256.Size]byte) (*block.Block, error
 }
 
 func (b *Blockchain) GetBlockByHeight(height int) (*block.Block, error) {
+	if height < 0 || height >= len(b.chain) {
+		return nil, errors.New(fmt.Sprintf("Invalid height: %v", height))
+	}
+	for _, b := range b.chain {
+		if b.GetHeight() == height {
+			return b, nil
+		}
+	}
 	return nil, errors.New(fmt.Sprintf("Block at pos %v not found", height))
 }
 

@@ -249,7 +249,7 @@ func TestGetBlockByHeight(t *testing.T) {
 		{
 			clock := BlockchainClockMock{}
 			blockchain := New(clock)
-			block, err := blockchain.GetBlockByHeight(0)
+			block, err := blockchain.GetBlockByHeight(-1)
 
 			if block != nil {
 				t.Fatal("\t\tShould return nil, got: ")
