@@ -1,6 +1,7 @@
 package blockchain
 
 import (
+	"crypto/sha256"
 	"fmt"
 	"testing"
 	"time"
@@ -177,4 +178,27 @@ func TestIsMessageOutdated(t *testing.T) {
 			t.Log("\t\tShould return err: ", err)
 		}
 	}
+}
+
+func TestGetBlockByHash(t *testing.T) {
+	t.Log("GetBlockByHash")
+	{
+		var hash [sha256.Size]byte
+		t.Log("\tGiven empty hash")
+		{
+			clock := BlockchainClockMock{}
+			blockchain := New(clock)
+			block, err := blockchain.GetBlockByHash(hash)
+
+			if block != nil {
+				t.Fatal("\t\tShould return nil, got: ")
+			}
+			t.Log("\t\tShould return nil")
+			if err == nil {
+				t.Fatal("\t\tShould return not nil err, got: ", err)
+			}
+			t.Log("\t\tShould return not nil err")
+		}
+	}
+	// TODO
 }

@@ -146,6 +146,9 @@ func VerifyMessage(req StarRequest) bool {
 	return true
 }
 
-// TODO GetBlockByHash
+func (b *Blockchain) GetBlockByHash(hash [sha256.Size]byte) (*block.Block, error) {
+	return nil, errors.New(fmt.Sprintf("Block %x not found", hash))
+}
+
 // TODO GetBlockByHeight
 // TODO GetStarsByWalletAddress
