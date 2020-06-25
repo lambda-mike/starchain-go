@@ -216,5 +216,30 @@ func TestGetBlockByHash(t *testing.T) {
 		}
 		t.Log("\t\tShould return genesis block")
 	}
-	// TODO
+	t.Log("\tGiven new block hash")
+	{
+		var (
+			addr = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
+			msg  = fmt.Sprintf("%s:%d:starRegistry", addr, 1592156792-3*60)
+			star = []byte("Brand new Star")
+			sig  = "TODO sig"
+			req  = StarRequest{addr, msg, star, sig}
+		)
+		clock := BlockchainClockMock{}
+		blockchain := New(clock)
+		blockchain.SubmitStar(req)
+		hash := blockchain.chain[1].GetHash()
+		block, err := blockchain.GetBlockByHash(hash)
+		// TODO remove
+		fmt.Println("Debug block: ", block)
+
+		if block == nil || block != blockchain.chain[1] {
+			t.Fatal("\t\tShould return new block, got: ", block)
+		}
+		t.Log("\t\tShould return new block")
+		if err != nil {
+			t.Fatal("\t\tShould not return err, got: ", err)
+		}
+		t.Log("\t\tShould return new block")
+	}
 }
