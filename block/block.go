@@ -65,7 +65,7 @@ func (b *Block) CalculateHash() [sha256.Size]byte {
 	}
 	prevH := ""
 	if b.prevHash != nil {
-		prevH = fmt.Sprintf("%s", b.prevHash)
+		prevH = fmt.Sprintf("%x", b.prevHash)
 	}
 	blockFields := fmt.Sprintf("|%d|%d|%s|%s|%s|", b.ts, b.height, b.owner, prevH, data)
 	return sha256.Sum256([]byte(blockFields))
