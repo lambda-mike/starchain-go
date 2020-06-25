@@ -176,6 +176,23 @@ func (b *Blockchain) GetStarsByWalletAddress(addr string) []*block.Block {
 	return blocks
 }
 
-func (b *Blockchain) ValidateChain() bool {
-	return false
+func (b *Blockchain) ValidateChain() []error {
+	validationErrs := []error{}
+	for i, block := range b.chain {
+		hash := block.GetHash()
+		if !block.Validate() {
+			msg := fmt.Sprintf("Block %x is invalid!", hash)
+			validationErrs = append(validationErrs, errors.New(msg))
+		}
+		if i > 0 {
+			prevBlock := b.chain[i-1]
+			prevBlockHash := prevBlock.CalculateHash()
+			blockPrevHash := block.GetPrevHash()
+			if prevBlockHash != blockPrevHash {
+				msg := fmt.Sprintf("Block %x prevHash %x does not match calculated hash %x", hash, blockPrevHash, prevBlockHash)
+				validationErrs = append(validationErrs, errors.New(msg))
+			}
+		}
+	}
+	return validationErrs
 }

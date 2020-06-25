@@ -399,28 +399,11 @@ func TestValidateChain(t *testing.T) {
 			{
 				clock := BlockchainClockMock{}
 				blockchain := New(clock)
-				isValid := blockchain.ValidateChain()
-				if !isValid {
-					t.Fatal("\t\tShould return true", isValid)
+				errors := blockchain.ValidateChain()
+				if len(errors) > 0 {
+					t.Fatal("\t\tShould return no errors, got: ", errors)
 				}
-				t.Log("\t\tShould return true")
-			}
-			t.Log("\tWhen hash is invalid")
-			{
-				var (
-					data  []byte = []byte("\"This is JSON string\"")
-					ts    int64  = time.Date(2020, time.June, 14, 17, 46, 32, 0, time.UTC).Unix()
-					h     int    = 7
-					owner string = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
-				)
-				clock := BlockchainClockMock{}
-				blockchain := New(clock)
-				blockchain.chain[0] = block.New(ts, h, owner, nil, data)
-				isValid := blockchain.ValidateChain()
-				if isValid {
-					t.Fatal("\t\tShould return false", isValid)
-				}
-				t.Log("\t\tShould return false")
+				t.Log("\t\tShould return no errors")
 			}
 		}
 		t.Log("Given 2 block chain")
@@ -437,11 +420,11 @@ func TestValidateChain(t *testing.T) {
 				clock := BlockchainClockMock{}
 				blockchain := New(clock)
 				blockchain.SubmitStar(req1)
-				isValid := blockchain.ValidateChain()
-				if !isValid {
-					t.Fatal("\t\tShould return true, got: ", isValid)
+				errors := blockchain.ValidateChain()
+				if len(errors) > 0 {
+					t.Fatal("\t\tShould return no errors, got: ", errors)
 				}
-				t.Log("\t\tShould return true")
+				t.Log("\t\tShould return no errors")
 			}
 			t.Log("\tWhen the first block is modified")
 			{
@@ -453,20 +436,20 @@ func TestValidateChain(t *testing.T) {
 					req1  = StarRequest{addr1, msg1, star1, sig}
 				)
 				var (
-					data  []byte = []byte("\"This is JSON string\"")
-					ts    int64  = time.Date(2020, time.June, 14, 17, 46, 32, 0, time.UTC).Unix()
-					h     int    = 7
-					owner string = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
+					data     []byte = []byte("Genesis Gopher Block")
+					prevHash [sha256.Size]byte
+					h        int    = 0
+					owner    string = ""
 				)
 				clock := BlockchainClockMock{}
 				blockchain := New(clock)
 				blockchain.SubmitStar(req1)
-				blockchain.chain[0] = block.New(ts, h, owner, nil, data)
-				isValid := blockchain.ValidateChain()
-				if isValid {
-					t.Fatal("\t\tShould return false, got: ", isValid)
+				blockchain.chain[0] = block.New(clock.GetTime()+1, h, owner, &prevHash, data)
+				errors := blockchain.ValidateChain()
+				if len(errors) <= 0 {
+					t.Fatal("\t\tShould return errors, got: ", errors)
 				}
-				t.Log("\t\tShould return false")
+				t.Log("\t\tShould return errors", errors)
 			}
 		}
 	}
