@@ -73,8 +73,6 @@ func (b *Blockchain) GetChainHeight() int {
 	return height
 }
 
-// TODO ValidateChain
-
 func (b *Blockchain) RequestMessageOwnershipVerification(addr string) (string, error) {
 	if addr == "" {
 		return "", EmptyAddrErr
@@ -147,6 +145,11 @@ func VerifyMessage(req StarRequest) bool {
 }
 
 func (b *Blockchain) GetBlockByHash(hash [sha256.Size]byte) (*block.Block, error) {
+	for _, b := range b.chain {
+		if b.GetHash() == hash {
+			return b, nil
+		}
+	}
 	return nil, errors.New(fmt.Sprintf("Block %x not found", hash))
 }
 

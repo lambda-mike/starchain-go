@@ -197,7 +197,7 @@ func TestGetBlockByHash(t *testing.T) {
 			if err == nil {
 				t.Fatal("\t\tShould return not nil err, got: ", err)
 			}
-			t.Log("\t\tShould return not nil err")
+			t.Log("\t\tShould return not nil err:", err)
 		}
 	}
 	t.Log("\tGiven genesis block hash")
@@ -230,8 +230,6 @@ func TestGetBlockByHash(t *testing.T) {
 		blockchain.SubmitStar(req)
 		hash := blockchain.chain[1].GetHash()
 		block, err := blockchain.GetBlockByHash(hash)
-		// TODO remove
-		fmt.Println("Debug block: ", block)
 
 		if block == nil || block != blockchain.chain[1] {
 			t.Fatal("\t\tShould return new block, got: ", block)
