@@ -3,6 +3,7 @@ package blockchain
 import (
 	"crypto/sha256"
 	"fmt"
+	"github.com/starchain/block"
 	"testing"
 	"time"
 )
@@ -384,6 +385,88 @@ func TestGetStarsByWalletAddress(t *testing.T) {
 					t.Fatal("\t\tShould return proper block, got: ", blocks[0])
 				}
 				t.Log("\t\tShould return proper blocks")
+			}
+		}
+	}
+}
+
+func TestValidateChain(t *testing.T) {
+	t.Log("ValidateChain")
+	{
+		t.Log("Given 1 block chain")
+		{
+			t.Log("\tWhen hash is valid")
+			{
+				clock := BlockchainClockMock{}
+				blockchain := New(clock)
+				isValid := blockchain.ValidateChain()
+				if !isValid {
+					t.Fatal("\t\tShould return true", isValid)
+				}
+				t.Log("\t\tShould return true")
+			}
+			t.Log("\tWhen hash is invalid")
+			{
+				var (
+					data  []byte = []byte("\"This is JSON string\"")
+					ts    int64  = time.Date(2020, time.June, 14, 17, 46, 32, 0, time.UTC).Unix()
+					h     int    = 7
+					owner string = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
+				)
+				clock := BlockchainClockMock{}
+				blockchain := New(clock)
+				blockchain.chain[0] = block.New(ts, h, owner, nil, data)
+				isValid := blockchain.ValidateChain()
+				if isValid {
+					t.Fatal("\t\tShould return false", isValid)
+				}
+				t.Log("\t\tShould return false")
+			}
+		}
+		t.Log("Given 2 block chain")
+		{
+			t.Log("\tWhen second block prev hash is valid")
+			{
+				var (
+					addr1 = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
+					msg1  = fmt.Sprintf("%s:%d:starRegistry", addr1, 1592156792-3*60)
+					star1 = []byte("Brand new Star 1")
+					sig   = "TODO sig"
+					req1  = StarRequest{addr1, msg1, star1, sig}
+				)
+				clock := BlockchainClockMock{}
+				blockchain := New(clock)
+				blockchain.SubmitStar(req1)
+				isValid := blockchain.ValidateChain()
+				if !isValid {
+					t.Fatal("\t\tShould return true, got: ", isValid)
+				}
+				t.Log("\t\tShould return true")
+			}
+			t.Log("\tWhen the first block is modified")
+			{
+				var (
+					addr1 = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
+					msg1  = fmt.Sprintf("%s:%d:starRegistry", addr1, 1592156792-3*60)
+					star1 = []byte("Brand new Star 1")
+					sig   = "TODO sig"
+					req1  = StarRequest{addr1, msg1, star1, sig}
+				)
+				var (
+					data  []byte = []byte("\"This is JSON string\"")
+					ts    int64  = time.Date(2020, time.June, 14, 17, 46, 32, 0, time.UTC).Unix()
+					h     int    = 7
+					owner string = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
+				)
+				clock := BlockchainClockMock{}
+				blockchain := New(clock)
+				blockchain.SubmitStar(req1)
+				blockchain.chain[0] = block.New(ts, h, owner, nil, data)
+				isValid := blockchain.ValidateChain()
+				if isValid {
+					t.Fatal("\t\tShould return false, got: ", isValid)
+				}
+				t.Log("\t\tShould return false")
 			}
 		}
 	}

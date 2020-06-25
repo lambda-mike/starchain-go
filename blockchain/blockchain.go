@@ -176,4 +176,6 @@ func (b *Blockchain) GetStarsByWalletAddress(addr string) []*block.Block {
 	return blocks
 }
 
-// TODO ValidateChain
+func (b *Blockchain) ValidateChain() bool {
+	return false
+}
