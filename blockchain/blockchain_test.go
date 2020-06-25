@@ -116,7 +116,6 @@ func TestSubmitStar(t *testing.T) {
 			if bHeight := block.GetHeight(); bHeight != 1 {
 				t.Fatal("\t\tShould return block with correct height, got: ", bHeight)
 			}
-			// TODO prevHash?
 			if bHeight := len(blockchain.chain); bHeight != 2 {
 				t.Fatal("\t\tShould add block to the chain so it is 2 items long, got: ", bHeight)
 			}

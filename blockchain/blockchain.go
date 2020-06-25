@@ -58,16 +58,11 @@ var (
 func New(clock Clock) *Blockchain {
 	var (
 		blockchain Blockchain
-		prevHash   *[sha256.Size]byte = nil
 	)
-	ts := clock.GetTime()
-	height := len(blockchain.chain)
 	owner := ""
 	data := []byte("Genesis Gopher Block")
-	genesisBlock := block.New(ts, height, owner, prevHash, data)
-	blockchain.chain = append(blockchain.chain, genesisBlock)
 	blockchain.clock = clock
-	// TODO reues add method?
+	blockchain.AddBlock(owner, data)
 	return &blockchain
 }
 
