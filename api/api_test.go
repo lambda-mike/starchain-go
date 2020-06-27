@@ -48,7 +48,7 @@ func TestRequestValidation(t *testing.T) {
 		t.Log("\tWhen called at /requestValidation")
 		{
 			// TODO create body from ValidationRequest
-			req, err := http.NewRequest("POST", "/ValidationRequest", nil)
+			req, err := http.NewRequest("POST", "/requestValidation", nil)
 			if err != nil {
 				t.Fatalf("\t\tShould be able to submit a validation request, got err: %v", err)
 			}
