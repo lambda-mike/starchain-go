@@ -11,7 +11,7 @@ import (
 )
 
 type Address = struct {
-	Address string
+	Address string `json:"address"`
 }
 
 var blockchain *contracts.Blockchain
@@ -30,13 +30,13 @@ func hello(res http.ResponseWriter, req *http.Request) {
 
 func requestValidation(res http.ResponseWriter, req *http.Request) {
 	log.Println("INFO: requestValidation")
-	var addr Address
 	if req.Body == nil {
 		log.Println("ERR: requestValidation: request body is nil")
 		res.WriteHeader(http.StatusBadRequest)
 		fmt.Fprint(res, "Error occurred when decoding address from JSON: empty body")
 		return
 	}
+	var addr Address
 	if err := json.NewDecoder(req.Body).Decode(&addr); err != nil {
 		log.Println("ERR: requestValidation: ", err)
 		res.WriteHeader(http.StatusBadRequest)
@@ -49,5 +49,7 @@ func requestValidation(res http.ResponseWriter, req *http.Request) {
 		fmt.Fprint(res, "address is required")
 		return
 	}
-	fmt.Fprint(res, "TODO ...")
+	// TODO get message from blockchain
+	msg := addr.Address
+	fmt.Fprint(res, msg)
 }

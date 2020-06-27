@@ -1,6 +1,8 @@
 package api
 
 import (
+	"bytes"
+	"encoding/json"
 	"github.com/starchain/contracts"
 	"io/ioutil"
 	"net/http"
@@ -47,8 +49,9 @@ func TestRequestValidation(t *testing.T) {
 	{
 		t.Log("\tWhen called at /requestValidation")
 		{
-			// TODO create body from ValidationRequest
-			req, err := http.NewRequest("POST", "/requestValidation", nil)
+			addr := Address{"TODO addr"}
+			data, _ := json.Marshal(addr)
+			req, err := http.NewRequest("POST", "/requestValidation", bytes.NewReader(data))
 			if err != nil {
 				t.Fatalf("\t\tShould be able to submit a validation request, got err: %v", err)
 			}
