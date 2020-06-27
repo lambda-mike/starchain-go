@@ -1,3 +1,5 @@
 package contracts
 
-type Blockchain interface{}
+type Blockchain interface {
+	RequestMessageOwnershipVerification(addr string) (string, error)
+}

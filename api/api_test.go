@@ -10,8 +10,14 @@ import (
 	"testing"
 )
 
+type BlockchainMock struct{}
+
+func (b BlockchainMock) RequestMessageOwnershipVerification(addr string) (string, error) {
+	return addr + " OK", nil
+}
+
 func init() {
-	var blockchain contracts.Blockchain
+	var blockchain contracts.Blockchain = BlockchainMock{}
 	RegisterHandlers(&blockchain)
 }
 
@@ -49,8 +55,8 @@ func TestRequestValidation(t *testing.T) {
 	{
 		t.Log("\tWhen called at /requestValidation")
 		{
-			addr := Address{"TODO addr"}
-			data, _ := json.Marshal(addr)
+			addr := "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
+			data, _ := json.Marshal(Address{addr})
 			req, err := http.NewRequest("POST", "/requestValidation", bytes.NewReader(data))
 			if err != nil {
 				t.Fatalf("\t\tShould be able to submit a validation request, got err: %v", err)
@@ -67,8 +73,9 @@ func TestRequestValidation(t *testing.T) {
 				t.Fatalf("\t\tShould not return err, got: %v", err)
 			}
 			t.Log("\t\tShould not return err")
-			if string(body) != "TODO" {
-				t.Fatalf("\t\tShould return correct message, got: \"%s\"", body)
+			expected := addr + " OK"
+			if string(body) != expected {
+				t.Fatalf("\t\tShould return correct message: \"%s\", got: \"%s\"", expected, body)
 			}
 			t.Log("\t\tShould return correct message")
 		}

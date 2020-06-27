@@ -16,8 +16,8 @@ type Address = struct {
 
 var blockchain *contracts.Blockchain
 
-func RegisterHandlers(blockchain *contracts.Blockchain) {
-	blockchain = blockchain
+func RegisterHandlers(b *contracts.Blockchain) {
+	blockchain = b
 	http.HandleFunc("/hello", hello)
 	http.HandleFunc("/requestValidation", requestValidation)
 	log.Println("INFO: Handlers registered successfully")
@@ -49,7 +49,12 @@ func requestValidation(res http.ResponseWriter, req *http.Request) {
 		fmt.Fprint(res, "address is required")
 		return
 	}
-	// TODO get message from blockchain
-	msg := addr.Address
+	msg, err := (*blockchain).RequestMessageOwnershipVerification(addr.Address)
+	if err != nil {
+		log.Println("ERR: requestValidation: ", err)
+		res.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(res, "Error occurred when calling blockchain for the validation msg")
+		return
+	}
 	fmt.Fprint(res, msg)
 }
