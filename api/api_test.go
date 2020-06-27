@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/starchain/contracts"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -8,7 +9,8 @@ import (
 )
 
 func init() {
-	RegisterHandlers()
+	var blockchain contracts.Blockchain
+	RegisterHandlers(&blockchain)
 }
 
 func TestHello(t *testing.T) {
