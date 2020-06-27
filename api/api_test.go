@@ -3,6 +3,7 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"github.com/starchain/contracts"
 	"io/ioutil"
 	"net/http"
@@ -78,6 +79,36 @@ func TestRequestValidation(t *testing.T) {
 				t.Fatalf("\t\tShould return correct message: \"%s\", got: \"%s\"", expected, body)
 			}
 			t.Log("\t\tShould return correct message")
+		}
+	}
+}
+
+func TestGetBlockByHeight(t *testing.T) {
+	t.Log("GetBlockByHeight")
+	{
+		t.Log("\tGiven a need to test endpoint /block/:height")
+		{
+			t.Log("\tWhen called with 0 index")
+			{
+				req, err := http.NewRequest("GET", "/block/0", nil)
+				if err != nil {
+					t.Fatalf("\t\tShould be able to create a get request, got err: %v", err)
+				}
+				t.Log("\t\tShould be able to create a get request")
+				recorder := httptest.NewRecorder()
+				http.DefaultServeMux.ServeHTTP(recorder, req)
+				if recorder.Code != 200 {
+					t.Fatalf("\t\tShould get response 200 OK, got: %v", recorder.Code)
+				}
+				t.Log("\t\tShould get response 200 OK")
+				// TODO add block to contracts
+				// TODO decode body to block
+				err = errors.New("TODO")
+				if err != nil {
+					t.Fatalf("\t\tShould not return err, got: %v", err)
+				}
+				t.Log("\t\tShould not return err")
+			}
 		}
 	}
 }
