@@ -17,13 +17,18 @@ func (b BlockchainMock) RequestMessageOwnershipVerification(addr string) (string
 	return addr + " OK", nil
 }
 
+func (b BlockchainMock) GetBlockByHeight(h int) (contracts.Block, error) {
+	var block contracts.Block
+	return block, errors.New("TODO")
+}
+
 func init() {
 	var blockchain contracts.Blockchain = BlockchainMock{}
 	RegisterHandlers(&blockchain)
 }
 
 func TestHello(t *testing.T) {
-	t.Log("TestHello")
+	t.Log("Hello")
 	{
 		t.Log("\tWhen called at /hello")
 		{
@@ -52,7 +57,7 @@ func TestHello(t *testing.T) {
 }
 
 func TestRequestValidation(t *testing.T) {
-	t.Log("TestRequestValidation")
+	t.Log("RequestValidation")
 	{
 		t.Log("\tWhen called at /requestValidation")
 		{
