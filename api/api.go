@@ -8,19 +8,50 @@ import (
 	"github.com/starchain/contracts"
 	"log"
 	"net/http"
+	"regexp"
 )
 
-type Address = struct {
+type BlockDto struct {
+	Body              string `json:"body"`
+	Hash              string `json:"hash"`
+	Height            int    `json:"height"`
+	Owner             string `json:"owner"`
+	PreviousBlockHash string `json:"previousBlockHash"`
+	Time              int64  `json:"time"`
+}
+
+// TODO postfix Dto
+type Address struct {
 	Address string `json:"address"`
 }
 
 var blockchain *contracts.Blockchain
 
-func RegisterHandlers(b *contracts.Blockchain) {
+func Create(b *contracts.Blockchain) http.Handler {
 	blockchain = b
-	http.HandleFunc("/hello", hello)
-	http.HandleFunc("/requestValidation", requestValidation)
-	log.Println("INFO: Handlers registered successfully")
+	api := newRestApi()
+	// TODO /hello
+	// TODO /requestValidation
+	// TODO /block
+	//log.Println("INFO: Handlers registered successfully")
+	log.Println("INFO: REST API created successfully")
+	return api
+}
+
+type restApi struct {
+	handlers map[string]http.HandlerFunc
+	cache    map[string]*regexp.Regexp
+}
+
+func newRestApi() *restApi {
+	return &restApi{
+		handlers: make(map[string]http.HandlerFunc),
+		cache:    make(map[string]*regexp.Regexp),
+	}
+}
+
+func (a *restApi) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	// TODO
 }
 
 func hello(res http.ResponseWriter, req *http.Request) {
@@ -57,4 +88,30 @@ func requestValidation(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 	fmt.Fprint(res, msg)
+}
+
+func getBlock(res http.ResponseWriter, req *http.Request) {
+	log.Println("INFO: getBlock")
+	log.Println("DBG: getBlock:url", req.URL)
+	/*if err := json.NewDecoder(req.Body).Decode(&addr); err != nil {
+		log.Println("ERR: requestValidation: ", err)
+		res.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(res, "Error occurred when decoding address from JSON")
+		return
+	}
+	if addr.Address == "" {
+		log.Println("ERR: requestValidation: empty address field")
+		res.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(res, "address is required")
+		return
+	}
+	msg, err := (*blockchain).RequestMessageOwnershipVerification(addr.Address)
+	if err != nil {
+		log.Println("ERR: requestValidation: ", err)
+		res.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(res, "Error occurred when calling blockchain for the validation msg")
+		return
+	}
+	*/
+	fmt.Fprint(res, "TODO")
 }

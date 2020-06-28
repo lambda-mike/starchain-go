@@ -24,7 +24,7 @@ func (b BlockchainMock) GetBlockByHeight(h int) (contracts.Block, error) {
 
 func init() {
 	var blockchain contracts.Blockchain = BlockchainMock{}
-	RegisterHandlers(&blockchain)
+	Create(&blockchain)
 }
 
 func TestHello(t *testing.T) {

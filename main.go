@@ -8,8 +8,9 @@ import (
 )
 
 func main() {
-	var blockchain contracts.Blockchain
 	log.Println("Hello StarchainGo!")
-	api.RegisterHandlers(&blockchain)
-	http.ListenAndServe(":8000", nil)
+	// TODO assign proper implementation!!
+	var blockchain contracts.Blockchain
+	restApi := api.Create(&blockchain)
+	http.ListenAndServe(":8000", restApi)
 }
