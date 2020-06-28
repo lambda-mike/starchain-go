@@ -22,28 +22,30 @@ func (b BlockchainMock) GetBlockByHeight(h int) (contracts.Block, error) {
 	return block, errors.New("TODO")
 }
 
-func init() {
+func createApi() *httptest.Server {
 	var blockchain contracts.Blockchain = BlockchainMock{}
-	Create(&blockchain)
+	api := Create(&blockchain)
+	return httptest.NewServer(api)
 }
 
 func TestHello(t *testing.T) {
 	t.Log("Hello")
 	{
+		server := createApi()
+		defer server.Close()
+		t.Log("Server url: ", server.URL)
 		t.Log("\tWhen called at /hello")
 		{
-			req, err := http.NewRequest("GET", "/hello", nil)
+			resp, err := http.Get(server.URL + "/hello")
 			if err != nil {
 				t.Fatalf("\t\tShould be able to create a request, err: %v", err)
 			}
 			t.Log("\t\tShould be able to create a request")
-			recorder := httptest.NewRecorder()
-			http.DefaultServeMux.ServeHTTP(recorder, req)
-			if recorder.Code != 200 {
-				t.Fatalf("\t\tShould get response 200 OK, got: %v", recorder.Code)
+			if resp.StatusCode != 200 {
+				t.Fatalf("\t\tShould get response 200 OK, got: %v", resp.StatusCode)
 			}
 			t.Log("\t\tShould get response 200 OK")
-			body, err := ioutil.ReadAll(recorder.Body)
+			body, err := ioutil.ReadAll(resp.Body)
 			if err != nil {
 				t.Fatalf("\t\tShould not return err, got: %v", err)
 			}

@@ -30,7 +30,7 @@ var blockchain *contracts.Blockchain
 func Create(b *contracts.Blockchain) http.Handler {
 	blockchain = b
 	api := newRestApi()
-	// TODO /hello
+	api.Add("GET /hello", hello)
 	// TODO /requestValidation
 	// TODO /block
 	//log.Println("INFO: Handlers registered successfully")
@@ -50,8 +50,25 @@ func newRestApi() *restApi {
 	}
 }
 
+func (a *restApi) Add(regex string, handler http.HandlerFunc) {
+	a.handlers[regex] = handler
+	compiled, err := regexp.Compile(regex)
+	if err != nil {
+		log.Panicln("Could not compile regexp: ", regex)
+	}
+	a.cache[regex] = compiled
+}
+
 func (a *restApi) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	// TODO
+	pattern := req.Method + " " + req.URL.Path
+	log.Println("DBG: ServeHTTP: ", pattern)
+	for regex, handler := range a.handlers {
+		if a.cache[regex].MatchString(pattern) {
+			handler(res, req)
+			return
+		}
+	}
+	http.NotFound(res, req)
 }
 
 func hello(res http.ResponseWriter, req *http.Request) {
