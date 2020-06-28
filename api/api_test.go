@@ -61,22 +61,23 @@ func TestHello(t *testing.T) {
 func TestRequestValidation(t *testing.T) {
 	t.Log("RequestValidation")
 	{
+		server := createApi()
+		defer server.Close()
+		t.Log("Server url: ", server.URL)
 		t.Log("\tWhen called at /requestValidation")
 		{
 			addr := "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
 			data, _ := json.Marshal(Address{addr})
-			req, err := http.NewRequest("POST", "/requestValidation", bytes.NewReader(data))
+			response, err := http.Post(server.URL+"/requestValidation", "application/json", bytes.NewReader(data))
 			if err != nil {
 				t.Fatalf("\t\tShould be able to submit a validation request, got err: %v", err)
 			}
 			t.Log("\t\tShould be able to submit a validation request")
-			recorder := httptest.NewRecorder()
-			http.DefaultServeMux.ServeHTTP(recorder, req)
-			if recorder.Code != 200 {
-				t.Fatalf("\t\tShould get response 200 OK, got: %v", recorder.Code)
+			if response.StatusCode != 200 {
+				t.Fatalf("\t\tShould get response 200 OK, got: %v", response.StatusCode)
 			}
 			t.Log("\t\tShould get response 200 OK")
-			body, err := ioutil.ReadAll(recorder.Body)
+			body, err := ioutil.ReadAll(response.Body)
 			if err != nil {
 				t.Fatalf("\t\tShould not return err, got: %v", err)
 			}
