@@ -32,8 +32,9 @@ func Create(b *contracts.Blockchain) http.Handler {
 	api := newRestApi()
 	api.Add("GET /hello", hello)
 	api.Add("POST /requestValidation", requestValidation)
-	// TODO /block
-	//log.Println("INFO: Handlers registered successfully")
+	api.Add("GET /block/.+", getBlock)
+	// TODO getBlocks
+	// TODO submitStar
 	log.Println("INFO: REST API created successfully")
 	return api
 }

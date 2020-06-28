@@ -94,19 +94,20 @@ func TestRequestValidation(t *testing.T) {
 func TestGetBlockByHeight(t *testing.T) {
 	t.Log("GetBlockByHeight")
 	{
+		server := createApi()
+		defer server.Close()
+		t.Log("Server url: ", server.URL)
 		t.Log("\tGiven a need to test endpoint /block/:height")
 		{
 			t.Log("\tWhen called with 0 index")
 			{
-				req, err := http.NewRequest("GET", "/block/0", nil)
+				response, err := http.Get(server.URL + "/block/0")
 				if err != nil {
-					t.Fatalf("\t\tShould be able to create a get request, got err: %v", err)
+					t.Fatalf("\t\tShould be able to get a block, got err: %v", err)
 				}
-				t.Log("\t\tShould be able to create a get request")
-				recorder := httptest.NewRecorder()
-				http.DefaultServeMux.ServeHTTP(recorder, req)
-				if recorder.Code != 200 {
-					t.Fatalf("\t\tShould get response 200 OK, got: %v", recorder.Code)
+				t.Log("\t\tShould be able to get a block")
+				if response.StatusCode != 200 {
+					t.Fatalf("\t\tShould get response 200 OK, got: %v", response.StatusCode)
 				}
 				t.Log("\t\tShould get response 200 OK")
 				// TODO add block to contracts
