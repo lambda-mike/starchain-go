@@ -12,7 +12,7 @@ import (
 )
 
 var mockBlocks [1]contracts.Block = [...]contracts.Block{
-	contracts.Block{"Genesis Block", "TODO", 0, "abcdef123", "", 1592156792},
+	contracts.Block{"Genesis Block", "123abc456", 0, "abcdef123", "", 1592156792},
 }
 
 type BlockchainMock struct{}
@@ -78,7 +78,7 @@ func TestRequestValidation(t *testing.T) {
 		t.Log("\tWhen called at /requestValidation")
 		{
 			addr := "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
-			data, _ := json.Marshal(Address{addr})
+			data, _ := json.Marshal(AddressDto{addr})
 			response, err := http.Post(server.URL+"/requestValidation", "application/json", bytes.NewReader(data))
 			if err != nil {
 				t.Fatalf("\t\tShould be able to submit a validation request, got err: %v", err)
@@ -126,7 +126,12 @@ func TestGetBlockByHeight(t *testing.T) {
 					t.Fatalf("\t\tShould decode response body, got err: %v; json: %v", err, response.Body)
 				}
 				t.Log("\t\tShould decode response body")
-				if block.Body != mockBlocks[0].Body || block.Time != mockBlocks[0].Time {
+				if block.Body != mockBlocks[0].Body ||
+					block.Time != mockBlocks[0].Time ||
+					block.Hash != mockBlocks[0].Hash ||
+					block.Owner != mockBlocks[0].Owner ||
+					block.PreviousBlockHash != mockBlocks[0].PreviousBlockHash ||
+					block.Height != mockBlocks[0].Height {
 					t.Fatalf("\t\tShould return genesis block, got: %v", block)
 				}
 				t.Log("\t\tShould return genesis block")

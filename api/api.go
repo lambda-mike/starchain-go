@@ -13,6 +13,10 @@ import (
 	"strings"
 )
 
+type AddressDto struct {
+	Address string `json:"address"`
+}
+
 type BlockDto struct {
 	Body              string `json:"body"`
 	Hash              string `json:"hash"`
@@ -20,11 +24,6 @@ type BlockDto struct {
 	Owner             string `json:"owner"`
 	PreviousBlockHash string `json:"previousBlockHash"`
 	Time              int64  `json:"time"`
-}
-
-// TODO postfix Dto
-type Address struct {
-	Address string `json:"address"`
 }
 
 var blockchain *contracts.Blockchain
@@ -88,7 +87,7 @@ func requestValidation(res http.ResponseWriter, req *http.Request) {
 		fmt.Fprint(res, "Error occurred when decoding address from JSON: empty body")
 		return
 	}
-	var addr Address
+	var addr AddressDto
 	if err := json.NewDecoder(req.Body).Decode(&addr); err != nil {
 		log.Println("ERR: requestValidation: ", err)
 		res.WriteHeader(http.StatusBadRequest)
