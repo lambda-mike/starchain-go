@@ -12,4 +12,5 @@ type Block = struct {
 type Blockchain interface {
 	RequestMessageOwnershipVerification(addr string) (string, error)
 	GetBlockByHeight(h int) (Block, error)
+	GetBlockByHash(h string) (Block, error)
 }

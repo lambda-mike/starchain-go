@@ -156,5 +156,40 @@ func getBlockByHeight(res http.ResponseWriter, req *http.Request) {
 
 func getBlockByHash(res http.ResponseWriter, req *http.Request) {
 	log.Println("INFO: getBlockByHash")
-	http.NotFound(res, req)
+	var parts []string
+	if parts = strings.Split(req.URL.Path, "/"); len(parts) != 4 {
+		log.Println("ERR: getBlockByHash: wrong url format", req.URL.Path)
+		res.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(res, "Could not fetch block by hash: bad request URL")
+		return
+	}
+	hash := parts[3]
+	block, err := (*blockchain).GetBlockByHash(hash)
+	respondWithBlock(res, req, &block, err)
+}
+
+func respondWithBlock(res http.ResponseWriter, req *http.Request, block *contracts.Block, err error) {
+	if err != nil {
+		log.Println("ERR: getBlockByHash: block not found: ", err)
+		res.WriteHeader(http.StatusNotFound)
+		fmt.Fprint(res, "Block not found")
+		return
+	}
+	blockDto := BlockDto{
+		Body:              block.Body,
+		Hash:              block.Hash,
+		Height:            block.Height,
+		Owner:             block.Owner,
+		PreviousBlockHash: block.PreviousBlockHash,
+		Time:              block.Time,
+	}
+	blockJson, err := json.Marshal(blockDto)
+	if err != nil {
+		log.Println("ERR: getBlockByHeight failed to marshal block: ", err)
+		res.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(res, "Failed to serialzise block into JSON")
+		return
+	}
+	res.Header().Set("Content-Type", "application/json")
+	fmt.Fprint(res, string(blockJson))
 }

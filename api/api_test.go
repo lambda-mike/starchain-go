@@ -11,8 +11,9 @@ import (
 	"testing"
 )
 
-var mockBlocks [1]contracts.Block = [...]contracts.Block{
-	contracts.Block{"Genesis Block", "123abc456", 0, "abcdef123", "", 1592156792},
+var mockBlocks [2]contracts.Block = [...]contracts.Block{
+	contracts.Block{"Genesis Block", "123abc456", 0, "", "", 1592156792},
+	contracts.Block{"Regular Block", "789abc987", 0, "7a7b7c", "123abc456", 1592156792},
 }
 
 type BlockchainMock struct{}
@@ -28,6 +29,18 @@ func (b BlockchainMock) GetBlockByHeight(h int) (contracts.Block, error) {
 		return mockBlocks[0], nil
 	case 1:
 		return block, errors.New("TODO")
+	default:
+		return block, errors.New("TODO")
+	}
+}
+
+func (b BlockchainMock) GetBlockByHash(h string) (contracts.Block, error) {
+	var block contracts.Block
+	switch h {
+	case "123abc456":
+		return mockBlocks[0], nil
+	case "789abc987":
+		return mockBlocks[1], nil
 	default:
 		return block, errors.New("TODO")
 	}
