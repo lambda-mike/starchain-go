@@ -129,29 +129,7 @@ func getBlockByHeight(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 	block, err := (*blockchain).GetBlockByHeight(height)
-	if err != nil {
-		log.Println("ERR: getBlockByHeight: block not found: ", err)
-		res.WriteHeader(http.StatusNotFound)
-		fmt.Fprint(res, "Block not found")
-		return
-	}
-	blockDto := BlockDto{
-		Body:              block.Body,
-		Hash:              block.Hash,
-		Height:            block.Height,
-		Owner:             block.Owner,
-		PreviousBlockHash: block.PreviousBlockHash,
-		Time:              block.Time,
-	}
-	blockJson, err := json.Marshal(blockDto)
-	if err != nil {
-		log.Println("ERR: getBlockByHeight failed to marshal block: ", err)
-		res.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(res, "Failed to serialzise block into JSON")
-		return
-	}
-	res.Header().Set("Content-Type", "application/json")
-	fmt.Fprint(res, string(blockJson))
+	respondWithBlock(res, req, &block, err)
 }
 
 func getBlockByHash(res http.ResponseWriter, req *http.Request) {
@@ -185,7 +163,7 @@ func respondWithBlock(res http.ResponseWriter, req *http.Request, block *contrac
 	}
 	blockJson, err := json.Marshal(blockDto)
 	if err != nil {
-		log.Println("ERR: getBlockByHeight failed to marshal block: ", err)
+		log.Println("ERR: respondWithBlock failed to marshal block: ", err)
 		res.WriteHeader(http.StatusBadRequest)
 		fmt.Fprint(res, "Failed to serialzise block into JSON")
 		return
