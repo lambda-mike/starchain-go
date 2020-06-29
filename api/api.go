@@ -9,6 +9,8 @@ import (
 	"log"
 	"net/http"
 	"regexp"
+	"strconv"
+	"strings"
 )
 
 type BlockDto struct {
@@ -111,25 +113,40 @@ func requestValidation(res http.ResponseWriter, req *http.Request) {
 func getBlock(res http.ResponseWriter, req *http.Request) {
 	log.Println("INFO: getBlock")
 	log.Println("DBG: getBlock:url", req.URL)
-	/*if err := json.NewDecoder(req.Body).Decode(&addr); err != nil {
-		log.Println("ERR: requestValidation: ", err)
+	// TODO handle hash variant
+	getBlockByHeight(res, req)
+}
+
+func getBlockByHeight(res http.ResponseWriter, req *http.Request) {
+	log.Println("INFO: getBlockByHeight")
+	var parts []string
+	if parts = strings.Split(req.URL.Path, "/"); len(parts) != 3 {
+		log.Println("ERR: getBlockByHeight: wrong url format", req.URL.Path)
 		res.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(res, "Error occurred when decoding address from JSON")
+		fmt.Fprint(res, "Could not fetch block by height: bad request URL")
 		return
 	}
-	if addr.Address == "" {
-		log.Println("ERR: requestValidation: empty address field")
-		res.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(res, "address is required")
-		return
-	}
-	msg, err := (*blockchain).RequestMessageOwnershipVerification(addr.Address)
+	heightStr := parts[2]
+	height, err := strconv.Atoi(heightStr)
 	if err != nil {
-		log.Println("ERR: requestValidation: ", err)
+		log.Println("ERR: getBlockByHeight: could not parse block height param: ", heightStr)
 		res.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(res, "Error occurred when calling blockchain for the validation msg")
+		fmt.Fprint(res, "Could not parse block height param: "+heightStr)
 		return
 	}
-	*/
-	fmt.Fprint(res, "TODO")
+	block, err := (*blockchain).GetBlockByHeight(height)
+	if err != nil {
+		log.Println("ERR: getBlockByHeight: block fetch by height failed: ", err)
+		res.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(res, "Block fetch by height failed")
+		return
+	}
+	blockJson, err := json.Marshal(block)
+	if err != nil {
+		log.Println("ERR: getBlockByHeight failed to marshal block: ", err)
+		res.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(res, "Failed to serialzise block into JSON")
+		return
+	}
+	fmt.Fprint(res, blockJson)
 }
