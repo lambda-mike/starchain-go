@@ -34,9 +34,10 @@ func Create(b *contracts.Blockchain) http.Handler {
 	api.Add("GET /hello", hello)
 	api.Add("POST /requestValidation", requestValidation)
 	api.Add("GET /block/\\d+", getBlockByHeight)
-	// TODO getBlockByHash
-	// TODO getBlocks
+	api.Add("GET /block/hash/\\w+", getBlockByHash)
 	// TODO submitStar
+	// TODO getBlocks
+	// TODO validate
 	log.Println("INFO: REST API created successfully")
 	return api
 }
@@ -151,4 +152,9 @@ func getBlockByHeight(res http.ResponseWriter, req *http.Request) {
 	}
 	res.Header().Set("Content-Type", "application/json")
 	fmt.Fprint(res, string(blockJson))
+}
+
+func getBlockByHash(res http.ResponseWriter, req *http.Request) {
+	log.Println("INFO: getBlockByHash")
+	http.NotFound(res, req)
 }

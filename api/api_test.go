@@ -151,3 +151,53 @@ func TestGetBlockByHeight(t *testing.T) {
 		}
 	}
 }
+
+func TestGetBlockByHash(t *testing.T) {
+	t.Log("GetBlockByHash")
+	{
+		server := createApi()
+		defer server.Close()
+		t.Log("Server url: ", server.URL)
+		t.Log("\tGiven a need to test endpoint /block/hash/:hash")
+		{
+			t.Log("\tWhen called with proper hash")
+			{
+				response, err := http.Get(server.URL + "/block/hash/" + mockBlocks[0].Hash)
+				if err != nil {
+					t.Fatalf("\t\tShould be able to get a block, got err: %v", err)
+				}
+				t.Log("\t\tShould be able to get a block")
+				if response.StatusCode != 200 {
+					t.Fatalf("\t\tShould get response 200 OK, got: %v", response.StatusCode)
+				}
+				t.Log("\t\tShould get response 200 OK")
+				var block BlockDto
+				if err := json.NewDecoder(response.Body).Decode(&block); err != nil {
+					t.Fatalf("\t\tShould decode response body, got err: %v; json: %v", err, response.Body)
+				}
+				t.Log("\t\tShould decode response body")
+				if block.Body != mockBlocks[0].Body ||
+					block.Time != mockBlocks[0].Time ||
+					block.Hash != mockBlocks[0].Hash ||
+					block.Owner != mockBlocks[0].Owner ||
+					block.PreviousBlockHash != mockBlocks[0].PreviousBlockHash ||
+					block.Height != mockBlocks[0].Height {
+					t.Fatalf("\t\tShould return genesis block, got: %v", block)
+				}
+				t.Log("\t\tShould return genesis block")
+			}
+			t.Log("\tWhen called with wrong hash")
+			{
+				response, err := http.Get(server.URL + "/block/hash/666")
+				if err != nil {
+					t.Fatal("\t\tShould not get an error for non existing block: ", err)
+				}
+				t.Log("\t\tShould not get an error for non existing block")
+				if response.StatusCode != 404 {
+					t.Fatal("\t\tShould return not found status code, got: ", response.StatusCode)
+				}
+				t.Log("\t\tShould return not found status code")
+			}
+		}
+	}
+}
