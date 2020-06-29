@@ -34,7 +34,8 @@ func Create(b *contracts.Blockchain) http.Handler {
 	api := newRestApi()
 	api.Add("GET /hello", hello)
 	api.Add("POST /requestValidation", requestValidation)
-	api.Add("GET /block/.+", getBlock)
+	api.Add("GET /block/\\d+", getBlockByHeight)
+	// TODO getBlockByHash
 	// TODO getBlocks
 	// TODO submitStar
 	log.Println("INFO: REST API created successfully")
@@ -110,13 +111,6 @@ func requestValidation(res http.ResponseWriter, req *http.Request) {
 	fmt.Fprint(res, msg)
 }
 
-func getBlock(res http.ResponseWriter, req *http.Request) {
-	log.Println("INFO: getBlock")
-	log.Println("DBG: getBlock:url", req.URL)
-	// TODO handle hash variant
-	getBlockByHeight(res, req)
-}
-
 func getBlockByHeight(res http.ResponseWriter, req *http.Request) {
 	log.Println("INFO: getBlockByHeight")
 	var parts []string
@@ -141,12 +135,21 @@ func getBlockByHeight(res http.ResponseWriter, req *http.Request) {
 		fmt.Fprint(res, "Block fetch by height failed")
 		return
 	}
-	blockJson, err := json.Marshal(block)
+	blockDto := BlockDto{
+		Body:              block.Body,
+		Hash:              block.Hash,
+		Height:            block.Height,
+		Owner:             block.Owner,
+		PreviousBlockHash: block.PreviousBlockHash,
+		Time:              block.Time,
+	}
+	blockJson, err := json.Marshal(blockDto)
 	if err != nil {
 		log.Println("ERR: getBlockByHeight failed to marshal block: ", err)
 		res.WriteHeader(http.StatusBadRequest)
 		fmt.Fprint(res, "Failed to serialzise block into JSON")
 		return
 	}
-	fmt.Fprint(res, blockJson)
+	res.Header().Set("Content-Type", "application/json")
+	fmt.Fprint(res, string(blockJson))
 }

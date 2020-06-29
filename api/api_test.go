@@ -11,6 +11,10 @@ import (
 	"testing"
 )
 
+var mockBlocks [1]contracts.Block = [...]contracts.Block{
+	contracts.Block{"Genesis Block", "TODO", 0, "abcdef123", "", 1592156792},
+}
+
 type BlockchainMock struct{}
 
 func (b BlockchainMock) RequestMessageOwnershipVerification(addr string) (string, error) {
@@ -19,7 +23,14 @@ func (b BlockchainMock) RequestMessageOwnershipVerification(addr string) (string
 
 func (b BlockchainMock) GetBlockByHeight(h int) (contracts.Block, error) {
 	var block contracts.Block
-	return block, errors.New("TODO")
+	switch h {
+	case 0:
+		return mockBlocks[0], nil
+	case 1:
+		return block, errors.New("TODO")
+	default:
+		return block, errors.New("TODO")
+	}
 }
 
 func createApi() *httptest.Server {
@@ -110,13 +121,15 @@ func TestGetBlockByHeight(t *testing.T) {
 					t.Fatalf("\t\tShould get response 200 OK, got: %v", response.StatusCode)
 				}
 				t.Log("\t\tShould get response 200 OK")
-				// TODO add block to contracts
-				// TODO decode body to block
-				err = errors.New("TODO")
-				if err != nil {
-					t.Fatalf("\t\tShould not return err, got: %v", err)
+				var block BlockDto
+				if err := json.NewDecoder(response.Body).Decode(&block); err != nil {
+					t.Fatalf("\t\tShould decode response body, got err: %v; json: %v", err, response.Body)
 				}
-				t.Log("\t\tShould not return err")
+				t.Log("\t\tShould decode response body")
+				if block.Body != mockBlocks[0].Body || block.Time != mockBlocks[0].Time {
+					t.Fatalf("\t\tShould return genesis block, got: %v", block)
+				}
+				t.Log("\t\tShould return genesis block")
 			}
 		}
 	}
