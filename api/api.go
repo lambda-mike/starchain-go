@@ -35,8 +35,8 @@ func Create(b *contracts.Blockchain) http.Handler {
 	api.Add("POST /requestValidation", requestValidation)
 	api.Add("GET /block/\\d+", getBlockByHeight)
 	api.Add("GET /block/hash/\\w+", getBlockByHash)
+	api.Add("GET /blocks/\\w+", getBlocks)
 	// TODO submitStar
-	// TODO getBlocks
 	// TODO validate
 	log.Println("INFO: REST API created successfully")
 	return api
@@ -146,6 +146,29 @@ func getBlockByHash(res http.ResponseWriter, req *http.Request) {
 	respondWithBlock(res, req, &block, err)
 }
 
+func getBlocks(res http.ResponseWriter, req *http.Request) {
+	log.Println("INFO: getBlocks")
+	var parts []string
+	if parts = strings.Split(req.URL.Path, "/"); len(parts) != 3 {
+		log.Println("ERR: getBlockByHash: wrong url format", req.URL.Path)
+		res.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(res, "Could not fetch block by hash: bad request URL")
+		return
+	}
+	addr := parts[2]
+	blocksData := (*blockchain).GetStarsByWalletAddress(addr)
+	json, err := json.Marshal(blocksData)
+	if err != nil {
+		log.Println("ERR: getBlocks failed to marshal blocks: ", err)
+		res.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(res, "Failed to serialize blocks data into JSON")
+		return
+	}
+	log.Println("DBG: blocksJson", string(json))
+	res.Header().Set("Content-Type", "application/json")
+	fmt.Fprint(res, string(json))
+}
+
 func respondWithBlock(res http.ResponseWriter, req *http.Request, block *contracts.Block, err error) {
 	if err != nil {
 		log.Println("ERR: getBlockByHash: block not found: ", err)
@@ -165,7 +188,7 @@ func respondWithBlock(res http.ResponseWriter, req *http.Request, block *contrac
 	if err != nil {
 		log.Println("ERR: respondWithBlock failed to marshal block: ", err)
 		res.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(res, "Failed to serialzise block into JSON")
+		fmt.Fprint(res, "Failed to serialize block into JSON")
 		return
 	}
 	res.Header().Set("Content-Type", "application/json")

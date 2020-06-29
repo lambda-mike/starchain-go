@@ -11,9 +11,11 @@ import (
 	"testing"
 )
 
-var mockBlocks [2]contracts.Block = [...]contracts.Block{
+var mockBlocks [4]contracts.Block = [...]contracts.Block{
 	contracts.Block{"Genesis Block", "123abc456", 0, "", "", 1592156792},
-	contracts.Block{"Regular Block", "789abc987", 0, "7a7b7c", "123abc456", 1592156792},
+	contracts.Block{"Regular Block", "789abc987", 0, "7a7b7c", "123abc456", 1592156794},
+	contracts.Block{"Other Block", "fff333", 0, "333fff", "789abc987", 1592156795},
+	contracts.Block{"Regular Block II", "789abc987", 0, "7a7b7c", "fff333", 1592156796},
 }
 
 type BlockchainMock struct{}
@@ -44,6 +46,16 @@ func (b BlockchainMock) GetBlockByHash(h string) (contracts.Block, error) {
 	default:
 		return block, errors.New("TODO")
 	}
+}
+
+func (b BlockchainMock) GetStarsByWalletAddress(addr string) []string {
+	var stars []string = make([]string, 0)
+	for _, b := range mockBlocks {
+		if b.Owner == addr {
+			stars = append(stars, b.Body) // In real implementation we will decode it
+		}
+	}
+	return stars
 }
 
 func createApi() *httptest.Server {
@@ -210,6 +222,63 @@ func TestGetBlockByHash(t *testing.T) {
 					t.Fatal("\t\tShould return not found status code, got: ", response.StatusCode)
 				}
 				t.Log("\t\tShould return not found status code")
+			}
+		}
+	}
+}
+
+func TestGetBlocks(t *testing.T) {
+	t.Log("GetBlocks")
+	{
+		server := createApi()
+		defer server.Close()
+		t.Log("Server url: ", server.URL)
+		t.Log("\tGiven a need to test endpoint /blocks/:address")
+		{
+			t.Log("\tWhen called with proper address")
+			{
+				owner := mockBlocks[1].Owner
+				response, err := http.Get(server.URL + "/blocks/" + owner)
+				if err != nil {
+					t.Fatalf("\t\tShould be able to get a block, got err: %v", err)
+				}
+				t.Log("\t\tShould be able to get blocks for given owner")
+				if response.StatusCode != 200 {
+					t.Fatalf("\t\tShould get response 200 OK, got: %v", response.StatusCode)
+				}
+				t.Log("\t\tShould get response 200 OK")
+				var blocks []string
+				if err := json.NewDecoder(response.Body).Decode(&blocks); err != nil {
+					t.Fatalf("\t\tShould decode response body, got err: %v; json: %v", err, response.Body)
+				}
+				t.Logf("\t\tShould decode response body %s", response.Body)
+				if blocks[0] != mockBlocks[1].Body {
+					t.Fatalf("\t\tShould return correct block: %v, got: %v", mockBlocks[1].Body, blocks[0])
+				}
+				if blocks[1] != mockBlocks[3].Body {
+					t.Fatalf("\t\tShould return correct block: %v, got: %v", mockBlocks[3].Body, blocks[1])
+				}
+				t.Log("\t\tShould return blocks data belonging to owner: ", owner)
+			}
+			t.Log("\tWhen called with wrong address")
+			{
+				response, err := http.Get(server.URL + "/blocks/666")
+				if err != nil {
+					t.Fatal("\t\tShould not get an error for non existing blocks: ", err)
+				}
+				t.Log("\t\tShould not get an error for non existing blocks")
+				if response.StatusCode != 200 {
+					t.Fatal("\t\tShould return OK status code, got: ", response.StatusCode)
+				}
+				t.Log("\t\tShould return OK status code")
+				var stars []string
+				if err := json.NewDecoder(response.Body).Decode(&stars); err != nil {
+					t.Fatalf("\t\tShould decode response body, got err: %v; json: %v", err, response.Body)
+				}
+				if len(stars) != 0 {
+					t.Fatalf("\t\tShould return empty slice, got: %v", stars)
+				}
+				t.Log("\t\tShould return empty slice")
 			}
 		}
 	}
