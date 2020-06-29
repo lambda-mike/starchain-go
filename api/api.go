@@ -164,7 +164,6 @@ func getBlocks(res http.ResponseWriter, req *http.Request) {
 		fmt.Fprint(res, "Failed to serialize blocks data into JSON")
 		return
 	}
-	log.Println("DBG: blocksJson", string(json))
 	res.Header().Set("Content-Type", "application/json")
 	fmt.Fprint(res, string(json))
 }

@@ -346,13 +346,13 @@ func TestGetStarsByWalletAddress(t *testing.T) {
 				clock := BlockchainClockMock{}
 				blockchain := New(clock)
 				blockchain.SubmitStar(req)
-				blocks := blockchain.GetStarsByWalletAddress(addr)
-				if len(blocks) != 1 {
-					t.Fatal("\t\tShould return not empty array, got: ", blocks)
+				stars := blockchain.GetStarsByWalletAddress(addr)
+				if len(stars) != 1 {
+					t.Fatal("\t\tShould return not empty array, got: ", stars)
 				}
 				t.Log("\t\tShould return not empty array")
-				if blocks[0].GetOwner() != addr || string(blocks[0].GetData()) != string(star) {
-					t.Fatal("\t\tShould return proper block, got: ", blocks[0])
+				if string(stars[0]) != string(star) {
+					t.Fatal("\t\tShould return proper block data, got: ", string(stars[0]))
 				}
 				t.Log("\t\tShould return proper blocks")
 			}
@@ -376,13 +376,13 @@ func TestGetStarsByWalletAddress(t *testing.T) {
 				blockchain := New(clock)
 				blockchain.SubmitStar(req1)
 				blockchain.SubmitStar(req2)
-				blocks := blockchain.GetStarsByWalletAddress(addr2)
-				if len(blocks) != 1 {
-					t.Fatal("\t\tShould return not empty array, got: ", blocks)
+				stars := blockchain.GetStarsByWalletAddress(addr2)
+				if len(stars) != 1 {
+					t.Fatal("\t\tShould return not empty array, got: ", stars)
 				}
 				t.Log("\t\tShould return not empty array")
-				if blocks[0].GetOwner() != addr2 || string(blocks[0].GetData()) != string(star2) {
-					t.Fatal("\t\tShould return proper block, got: ", blocks[0])
+				if string(stars[0]) != string(star2) {
+					t.Fatal("\t\tShould return proper block, got: ", string(stars[0]))
 				}
 				t.Log("\t\tShould return proper blocks")
 			}

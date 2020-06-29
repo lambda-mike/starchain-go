@@ -25,6 +25,7 @@ type Blockchain struct {
 	clock Clock
 }
 
+// TODO move to contracts pkg; add DTO
 // StarRequest struct contains all data requiered to create a new star
 // in the blockchain.
 type StarRequest struct {
@@ -34,6 +35,7 @@ type StarRequest struct {
 	Sig      string
 }
 
+// TODO move to contracts pkg
 type Clock interface {
 	GetTime() int64
 }
@@ -169,17 +171,19 @@ func (b *Blockchain) GetBlockByHeight(height int) (*block.Block, error) {
 	return nil, errors.New(fmt.Sprintf("Block at pos %v not found", height))
 }
 
-func (b *Blockchain) GetStarsByWalletAddress(addr string) []*block.Block {
+// GetStarsByWalletAddress method should return data for stars
+// belonging to givend address
+func (b *Blockchain) GetStarsByWalletAddress(addr string) []string {
 	b.mutex.RLock()
 	defer b.mutex.RUnlock()
-	var blocks []*block.Block
+	var stars []string
 	// Ommit genesis block - it has no owner
 	for _, block := range b.chain[1:] {
 		if block.GetOwner() == addr {
-			blocks = append(blocks, block)
+			stars = append(stars, string(block.GetData()))
 		}
 	}
-	return blocks
+	return stars
 }
 
 func (b *Blockchain) ValidateChain() []error {
