@@ -130,9 +130,9 @@ func getBlockByHeight(res http.ResponseWriter, req *http.Request) {
 	}
 	block, err := (*blockchain).GetBlockByHeight(height)
 	if err != nil {
-		log.Println("ERR: getBlockByHeight: block fetch by height failed: ", err)
-		res.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(res, "Block fetch by height failed")
+		log.Println("ERR: getBlockByHeight: block not found: ", err)
+		res.WriteHeader(http.StatusNotFound)
+		fmt.Fprint(res, "Block not found")
 		return
 	}
 	blockDto := BlockDto{

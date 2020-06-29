@@ -110,7 +110,7 @@ func TestGetBlockByHeight(t *testing.T) {
 		t.Log("Server url: ", server.URL)
 		t.Log("\tGiven a need to test endpoint /block/:height")
 		{
-			t.Log("\tWhen called with 0 index")
+			t.Log("\tWhen called with proper index")
 			{
 				response, err := http.Get(server.URL + "/block/0")
 				if err != nil {
@@ -130,6 +130,18 @@ func TestGetBlockByHeight(t *testing.T) {
 					t.Fatalf("\t\tShould return genesis block, got: %v", block)
 				}
 				t.Log("\t\tShould return genesis block")
+			}
+			t.Log("\tWhen called with wrong index")
+			{
+				response, err := http.Get(server.URL + "/block/666")
+				if err != nil {
+					t.Fatal("\t\tShould not get an error for non existing block: ", err)
+				}
+				t.Log("\t\tShould not get an error for non existing block")
+				if response.StatusCode != 404 {
+					t.Fatal("\t\tShould return not found status code, got: ", response.StatusCode)
+				}
+				t.Log("\t\tShould return not found status code")
 			}
 		}
 	}
