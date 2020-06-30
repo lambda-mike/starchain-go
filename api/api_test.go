@@ -61,10 +61,11 @@ func (b BlockchainMock) GetStarsByWalletAddress(addr string) []string {
 
 func (b BlockchainMock) SubmitStar(star contracts.StarData) (contracts.Block, error) {
 	var block contracts.Block
-	switch star.Message {
-	// TODO
-	default:
-		return block, errors.New("TODO")
+	if star.Message != "" {
+		block := contracts.Block{string(star.Data), "1a32", 1, star.Address, mockBlocks[0].Hash, 1592156792}
+		return block, nil
+	} else {
+		return block, errors.New("Empty message error!")
 	}
 }
 
@@ -319,7 +320,8 @@ func TestSubmitStar(t *testing.T) {
 				}
 				t.Log("\t\tShould be able to post a star")
 				if response.StatusCode != http.StatusCreated {
-					t.Fatalf("\t\tShould get response 201 Created, got: %v", response.StatusCode)
+					body, _ := ioutil.ReadAll(response.Body)
+					t.Fatalf("\t\tShould get response 201 Created, got: %v, err: %v", response.StatusCode, string(body))
 				}
 				t.Log("\t\tShould get response 201 Created")
 				var block contracts.Block
@@ -331,8 +333,8 @@ func TestSubmitStar(t *testing.T) {
 					t.Fatalf("\t\tShould return block with owner: %v, got: %v", addr, block.Owner)
 				}
 				t.Logf("\t\tShould return block with correct owner")
-				if block.Height != 4 {
-					t.Fatalf("\t\tShould return block with height: %v, got: %v", 4, block.Height)
+				if block.Height != 1 {
+					t.Fatalf("\t\tShould return block with height: %v, got: %v", 1, block.Height)
 				}
 				t.Logf("\t\tShould return block with correct height")
 			}
@@ -341,14 +343,15 @@ func TestSubmitStar(t *testing.T) {
 				var star StarDto
 				data, _ := json.Marshal(star)
 				response, err := http.Post(server.URL+"/submitStar", "application/json", bytes.NewReader(data))
-				if err == nil {
-					t.Fatal("\t\tShould get an error for malformed star data, got nil")
+				if err != nil {
+					t.Fatal("\t\tShould not get an error for malformed star data, got: ", err)
 				}
-				t.Log("\t\tShould get an error for malformed star data")
-				if response.StatusCode != http.StatusBadRequest {
-					t.Fatal("\t\tShould return BadRequest status code, got: ", response.StatusCode)
+				t.Log("\t\tShould not get an error for malformed star data")
+				if response.StatusCode != http.StatusInternalServerError {
+					t.Fatal("\t\tShould return InternalServerError status code and error, got: ", response.StatusCode)
 				}
-				t.Log("\t\tShould return BadRequest status code")
+				body, _ := ioutil.ReadAll(response.Body)
+				t.Log("\t\tShould return InternalServerError status code and error:", string(body))
 			}
 		}
 	}

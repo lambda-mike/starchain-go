@@ -39,12 +39,11 @@ func Create(b *contracts.BlockchainOperator) http.Handler {
 	blockchain = b
 	api := newRestApi()
 	api.Add("GET /hello", hello)
-	api.Add("POST /requestValidation", requestValidation)
 	api.Add("GET /block/\\d+", getBlockByHeight)
 	api.Add("GET /block/hash/\\w+", getBlockByHash)
 	api.Add("GET /blocks/\\w+", getBlocks)
-	// TODO submitStar
-	// TODO validate
+	api.Add("POST /requestValidation", requestValidation)
+	api.Add("POST /submitStar", submitStar)
 	log.Println("INFO: REST API created successfully")
 	return api
 }
@@ -115,6 +114,7 @@ func requestValidation(res http.ResponseWriter, req *http.Request) {
 		fmt.Fprint(res, "Error occurred when calling blockchain for the validation msg")
 		return
 	}
+	res.WriteHeader(http.StatusOK)
 	fmt.Fprint(res, msg)
 }
 
@@ -171,13 +171,62 @@ func getBlocks(res http.ResponseWriter, req *http.Request) {
 		fmt.Fprint(res, "Failed to serialize blocks data into JSON")
 		return
 	}
+	res.WriteHeader(http.StatusOK)
 	res.Header().Set("Content-Type", "application/json")
 	fmt.Fprint(res, string(json))
 }
 
+func submitStar(res http.ResponseWriter, req *http.Request) {
+	log.Println("INFO: submitStar")
+	if req.Body == nil {
+		log.Println("ERR: submitStar: request body is nil")
+		res.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(res, "Error occurred when decoding star data: empty body")
+		return
+	}
+	var starDto StarDto
+	if err := json.NewDecoder(req.Body).Decode(&starDto); err != nil {
+		log.Println("ERR: submitStar: ", err)
+		res.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(res, "Error occurred when decoding star from JSON")
+		return
+	}
+	star := contracts.StarData{
+		Address:   starDto.Address,
+		Message:   starDto.Message,
+		Data:      starDto.Data,
+		Signature: starDto.Signature,
+	}
+	block, err := (*blockchain).SubmitStar(star)
+	if err != nil {
+		log.Println("ERR: submitStar: ", err)
+		res.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(res, "Star submition failed: "+err.Error())
+		return
+	}
+	blockDto := BlockDto{
+		Body:              block.Body,
+		Hash:              block.Hash,
+		Height:            block.Height,
+		Owner:             block.Owner,
+		PreviousBlockHash: block.PreviousBlockHash,
+		Time:              block.Time,
+	}
+	blockJson, err := json.Marshal(blockDto)
+	if err != nil {
+		log.Println("ERR: submitStar failed to marshal block: ", err)
+		res.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(res, "Failed to serialize block into JSON")
+		return
+	}
+	res.WriteHeader(http.StatusCreated)
+	res.Header().Set("Content-Type", "application/json")
+	fmt.Fprint(res, string(blockJson))
+}
+
 func respondWithBlock(res http.ResponseWriter, req *http.Request, block *contracts.Block, err error) {
 	if err != nil {
-		log.Println("ERR: getBlockByHash: block not found: ", err)
+		log.Println("ERR: respondWithBlock: block not found: ", err)
 		res.WriteHeader(http.StatusNotFound)
 		fmt.Fprint(res, "Block not found")
 		return
@@ -197,6 +246,7 @@ func respondWithBlock(res http.ResponseWriter, req *http.Request, block *contrac
 		fmt.Fprint(res, "Failed to serialize block into JSON")
 		return
 	}
+	res.WriteHeader(http.StatusOK)
 	res.Header().Set("Content-Type", "application/json")
 	fmt.Fprint(res, string(blockJson))
 }
