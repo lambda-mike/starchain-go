@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/starchain/contracts"
 	"io/ioutil"
 	"net/http"
@@ -288,6 +289,66 @@ func TestGetBlocks(t *testing.T) {
 					t.Fatalf("\t\tShould return empty slice, got: %v", stars)
 				}
 				t.Log("\t\tShould return empty slice")
+			}
+		}
+	}
+}
+
+func TestSubmitStar(t *testing.T) {
+	t.Log("SubmitStar")
+	{
+		server := createApi()
+		defer server.Close()
+		t.Log("Server url: ", server.URL)
+		t.Log("\tGiven a need to test endpoint /submitStar")
+		{
+			t.Log("\tWhen called with proper data")
+			{
+				addr := "a1b2c3"
+				msg := fmt.Sprintf("%s:%d:starRegistry", addr, 1592156792)
+				star := StarDto{
+					Address:   addr,
+					Message:   msg,
+					Data:      []byte("This is brand new Star"),
+					Signature: "doesnotmatter",
+				}
+				data, _ := json.Marshal(star)
+				response, err := http.Post(server.URL+"/submitStar", "application/json", bytes.NewReader(data))
+				if err != nil {
+					t.Fatalf("\t\tShould be able to post a star, got err: %v", err)
+				}
+				t.Log("\t\tShould be able to post a star")
+				if response.StatusCode != http.StatusCreated {
+					t.Fatalf("\t\tShould get response 201 Created, got: %v", response.StatusCode)
+				}
+				t.Log("\t\tShould get response 201 Created")
+				var block contracts.Block
+				if err := json.NewDecoder(response.Body).Decode(&block); err != nil {
+					t.Fatalf("\t\tShould decode response body, got err: %v; json: %v", err, response.Body)
+				}
+				t.Logf("\t\tShould decode response body %s", response.Body)
+				if block.Owner != addr {
+					t.Fatalf("\t\tShould return block with owner: %v, got: %v", addr, block.Owner)
+				}
+				t.Logf("\t\tShould return block with correct owner")
+				if block.Height != 4 {
+					t.Fatalf("\t\tShould return block with height: %v, got: %v", 4, block.Height)
+				}
+				t.Logf("\t\tShould return block with correct height")
+			}
+			t.Log("\tWhen called with wrong data")
+			{
+				var star StarDto
+				data, _ := json.Marshal(star)
+				response, err := http.Post(server.URL+"/submitStar", "application/json", bytes.NewReader(data))
+				if err == nil {
+					t.Fatal("\t\tShould get an error for malformed star data, got nil")
+				}
+				t.Log("\t\tShould get an error for malformed star data")
+				if response.StatusCode != http.StatusBadRequest {
+					t.Fatal("\t\tShould return BadRequest status code, got: ", response.StatusCode)
+				}
+				t.Log("\t\tShould return BadRequest status code")
 			}
 		}
 	}
