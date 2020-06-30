@@ -10,7 +10,7 @@ import (
 func main() {
 	log.Println("Hello StarchainGo!")
 	// TODO assign proper implementation!!
-	var blockchain contracts.Blockchain
+	var blockchain contracts.BlockchainOperator
 	restApi := api.Create(&blockchain)
 	http.ListenAndServe(":8000", restApi)
 }

@@ -58,8 +58,17 @@ func (b BlockchainMock) GetStarsByWalletAddress(addr string) []string {
 	return stars
 }
 
+func (b BlockchainMock) SubmitStar(star contracts.StarData) (contracts.Block, error) {
+	var block contracts.Block
+	switch star.Message {
+	// TODO
+	default:
+		return block, errors.New("TODO")
+	}
+}
+
 func createApi() *httptest.Server {
-	var blockchain contracts.Blockchain = BlockchainMock{}
+	var blockchain contracts.BlockchainOperator = BlockchainMock{}
 	api := Create(&blockchain)
 	return httptest.NewServer(api)
 }

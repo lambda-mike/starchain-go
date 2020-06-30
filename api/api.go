@@ -26,9 +26,16 @@ type BlockDto struct {
 	Time              int64  `json:"time"`
 }
 
-var blockchain *contracts.Blockchain
+type StarDto struct {
+	Address   string `json:"address"`
+	Message   string `json:"message"`
+	Data      []byte `json:"star"`
+	Signature string `json:"signature"`
+}
 
-func Create(b *contracts.Blockchain) http.Handler {
+var blockchain *contracts.BlockchainOperator
+
+func Create(b *contracts.BlockchainOperator) http.Handler {
 	blockchain = b
 	api := newRestApi()
 	api.Add("GET /hello", hello)
