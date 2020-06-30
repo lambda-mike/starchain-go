@@ -2,15 +2,24 @@ package main
 
 import (
 	"github.com/starchain/api"
+	"github.com/starchain/blockchain"
 	"github.com/starchain/contracts"
+	"github.com/starchain/proxy"
 	"log"
 	"net/http"
 )
 
 func main() {
 	log.Println("Hello StarchainGo!")
-	// TODO assign proper implementation!!
-	var blockchain contracts.BlockchainOperator
-	restApi := api.Create(&blockchain)
+	var (
+		bchain *blockchain.Blockchain
+		// TODO move to contracts
+		clock           blockchain.Clock
+		blockchainProxy contracts.BlockchainOperator
+	)
+	clock = blockchain.BlockchainClock{}
+	bchain = blockchain.New(clock)
+	blockchainProxy = proxy.New(bchain)
+	restApi := api.Create(&blockchainProxy)
 	http.ListenAndServe(":8000", restApi)
 }
