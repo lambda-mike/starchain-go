@@ -134,10 +134,39 @@ func TestGetBlockByHash(t *testing.T) {
 	}
 }
 
-func (b BlockchainProxy) TestGetStarsByWalletAddress(addr string) []string {
-	// TODO
-	var stars []string = make([]string, 0)
-	return stars
+func TestGetStarsByWalletAddress(t *testing.T) {
+	t.Log("TestGetStarsByWalletAddress")
+	{
+		bchain := blockchain.New(clock)
+		proxy := New(bchain)
+		starsData := [][]byte{
+			[]byte("Data 1"),
+			[]byte("Data 2"),
+			[]byte("Data 3"),
+		}
+		t.Log("\tGiven a proper block address argument and empty blockchain")
+		{
+			stars := proxy.GetStarsByWalletAddress(addr)
+			if len(stars) != 0 {
+				t.Fatal("\t\tShould return no stars, got:", len(stars))
+			}
+			t.Log("\t\tShould return no stars")
+			bchain.AddBlock(addr, starsData[0])
+			bchain.AddBlock("nope", starsData[1])
+			bchain.AddBlock(addr, starsData[2])
+			stars = proxy.GetStarsByWalletAddress(addr)
+			if len(stars) != 2 {
+				t.Fatal("\t\tShould return 2 stars, got:", len(stars))
+			}
+			if stars[0] != string(starsData[0]) {
+				t.Fatalf("\t\tShould return correct star: %s, got: %s", starsData[0], stars[0])
+			}
+			if stars[1] != string(starsData[2]) {
+				t.Fatalf("\t\tShould return correct star: %s, got: %s", starsData[2], stars[1])
+			}
+			t.Log("\t\tShould return correct 2 stars")
+		}
+	}
 }
 
 func (b BlockchainProxy) TestSubmitStar(star contracts.StarData) (contracts.Block, error) {
