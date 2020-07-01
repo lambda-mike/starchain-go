@@ -58,10 +58,23 @@ func TestGetBlockByHeight(t *testing.T) {
 				t.Fatal("\t\tShould return block with height", h, "got:", block.Height)
 			}
 			t.Log("\t\tShould return block with correct height")
-			if block.Body != "ast" {
+			expectedBody := "Genesis Gopher Block"
+			if block.Body != expectedBody {
 				t.Fatal("\t\tShould return block with correct data, got:", block.Body)
 			}
 			t.Log("\t\tShould return block with correct data")
+			if block.Hash != "8a9a61241b4825dfa8884c04678899974ddfde55532a2fbadc07fc78472c8731" {
+				t.Fatal("\t\tShould return block with correct hash, got:", block.Hash)
+			}
+			t.Log("\t\tShould return block with correct hash")
+			if block.Owner != "" {
+				t.Fatal("\t\tShould return block with correct owner, got:", block.Owner)
+			}
+			t.Log("\t\tShould return block with correct owner")
+			if block.PreviousBlockHash != "0000000000000000000000000000000000000000000000000000000000000000" {
+				t.Fatal("\t\tShould return block with correct PreviousBlockHash, got:", block.PreviousBlockHash)
+			}
+			t.Log("\t\tShould return block with correct PreviousBlockHash")
 		}
 	}
 }

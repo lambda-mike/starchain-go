@@ -4,6 +4,7 @@ package proxy
 
 import (
 	"errors"
+	"fmt"
 	"github.com/starchain/blockchain"
 	"github.com/starchain/contracts"
 )
@@ -21,12 +22,18 @@ func (b BlockchainProxy) RequestMessageOwnershipVerification(addr string) (strin
 }
 
 func (b BlockchainProxy) GetBlockByHeight(h int) (contracts.Block, error) {
-	// TODO
-	var block contracts.Block
-	switch h {
-	default:
-		return block, errors.New("TODO")
+	var result contracts.Block
+	block, err := b.blockchain.GetBlockByHeight(h)
+	if err == nil {
+		result.Body = string(block.GetData())
+		// TODO reuse utils.HashToStr fn
+		result.Hash = fmt.Sprintf("%x", block.GetHash())
+		result.Height = block.GetHeight()
+		result.Owner = block.GetOwner()
+		result.PreviousBlockHash = fmt.Sprintf("%x", block.GetPrevHash())
+		result.Time = block.GetTimestamp()
 	}
+	return result, err
 }
 
 func (b BlockchainProxy) GetBlockByHash(h string) (contracts.Block, error) {
