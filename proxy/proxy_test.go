@@ -76,6 +76,15 @@ func TestGetBlockByHeight(t *testing.T) {
 			}
 			t.Log("\t\tShould return block with correct PreviousBlockHash")
 		}
+		h = 6
+		t.Log("\tGiven a wrong block height argument", h)
+		{
+			_, err := proxy.GetBlockByHeight(h)
+			if err == nil {
+				t.Fatal("\t\tShould return err, got nil")
+			}
+			t.Log("\t\tShould return err:", err)
+		}
 	}
 }
 
