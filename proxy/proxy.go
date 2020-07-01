@@ -17,8 +17,7 @@ func New(blockchain *blockchain.Blockchain) BlockchainProxy {
 }
 
 func (b BlockchainProxy) RequestMessageOwnershipVerification(addr string) (string, error) {
-	// TODO
-	return addr + " OK", nil
+	return b.blockchain.RequestMessageOwnershipVerification(addr)
 }
 
 func (b BlockchainProxy) GetBlockByHeight(h int) (contracts.Block, error) {
