@@ -194,7 +194,7 @@ func TestSubmitStar(t *testing.T) {
 				t.Fatal("\t\tShould return block with correct data, got:", block.Body)
 			}
 			t.Log("\t\tShould return block with correct data")
-			if block.Hash != "TODO" {
+			if block.Hash != "c02b0315cdb0461a4bb4945ad132f28084ae8bb20f4038bc1ed3e181097aed2f" {
 				t.Fatal("\t\tShould return block with correct hash, got:", block.Hash)
 			}
 			t.Log("\t\tShould return block with correct hash")
@@ -205,7 +205,18 @@ func TestSubmitStar(t *testing.T) {
 			if block.PreviousBlockHash != "8a9a61241b4825dfa8884c04678899974ddfde55532a2fbadc07fc78472c8731" {
 				t.Fatal("\t\tShould return block with correct PreviousBlockHash, got:", block.PreviousBlockHash)
 			}
-			t.Log("\t\tShould return block with correct PreviousBlockHash")
+		}
+		t.Log("\tGiven wrong message")
+		{
+			var star contracts.StarData
+			star.Address = addr
+			star.Message = addr + ":1:starRegistry"
+			star.Data = []byte("New Star")
+			_, err := proxy.SubmitStar(star)
+			if err == nil {
+				t.Fatal("\t\tShould return err, got nil")
+			}
+			t.Log("\t\tShould return error:", err)
 		}
 	}
 }
