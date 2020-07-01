@@ -154,7 +154,7 @@ func TestGetHash(t *testing.T) {
 		{
 			block := New(ts, h, owner, &prevH, data)
 			actual := block.GetHash()
-			expected := "98bf2b79268c11a87f47e9cf612afa3529c4da08ca85810abd24e3905dc94548"
+			expected := "874622f4398bad94091484dc8e6d0ff0bfb4b673297d4121dfe23dcb6decefde"
 			if fmt.Sprintf("%x", actual) != expected {
 				t.Fatalf("\t\tShould return correct hash:\n%s, got:\n%x", expected, actual)
 			}
