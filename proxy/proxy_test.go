@@ -1,7 +1,6 @@
 package proxy
 
 import (
-	"errors"
 	"github.com/starchain/blockchain"
 	"github.com/starchain/contracts"
 	"testing"
@@ -88,12 +87,50 @@ func TestGetBlockByHeight(t *testing.T) {
 	}
 }
 
-func (b BlockchainProxy) TestGetBlockByHash(h string) (contracts.Block, error) {
-	// TODO
-	var block contracts.Block
-	switch h {
-	default:
-		return block, errors.New("TODO")
+func TestGetBlockByHash(t *testing.T) {
+	t.Log("TestGetBlockByHash")
+	{
+		bchain := blockchain.New(clock)
+		proxy := New(bchain)
+		hash := "8a9a61241b4825dfa8884c04678899974ddfde55532a2fbadc07fc78472c8731"
+		t.Log("\tGiven a proper block hash argument", hash)
+		{
+			block, err := proxy.GetBlockByHash(hash)
+			if err != nil {
+				t.Fatal("\t\tShould return block without err, got err: ", err)
+			}
+			t.Log("\t\tShould return block without error")
+			if block.Height != 0 {
+				t.Fatal("\t\tShould return block with height", 0, "got:", block.Height)
+			}
+			t.Log("\t\tShould return block with correct height")
+			expectedBody := "Genesis Gopher Block"
+			if block.Body != expectedBody {
+				t.Fatal("\t\tShould return block with correct data, got:", block.Body)
+			}
+			t.Log("\t\tShould return block with correct data")
+			if block.Hash != hash {
+				t.Fatal("\t\tShould return block with correct hash, got:", block.Hash)
+			}
+			t.Log("\t\tShould return block with correct hash")
+			if block.Owner != "" {
+				t.Fatal("\t\tShould return block with correct owner, got:", block.Owner)
+			}
+			t.Log("\t\tShould return block with correct owner")
+			if block.PreviousBlockHash != "0000000000000000000000000000000000000000000000000000000000000000" {
+				t.Fatal("\t\tShould return block with correct PreviousBlockHash, got:", block.PreviousBlockHash)
+			}
+			t.Log("\t\tShould return block with correct PreviousBlockHash")
+		}
+		hash = "nope"
+		t.Log("\tGiven a wrong block hash argument", hash)
+		{
+			_, err := proxy.GetBlockByHash(hash)
+			if err == nil {
+				t.Fatal("\t\tShould return err, got nil")
+			}
+			t.Log("\t\tShould return err:", err)
+		}
 	}
 }
 
