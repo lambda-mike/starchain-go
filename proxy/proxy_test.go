@@ -41,12 +41,28 @@ func TestRequestMessageOwnershipVerification(t *testing.T) {
 	}
 }
 
-func (b BlockchainProxy) TestGetBlockByHeight(h int) (contracts.Block, error) {
-	// TODO
-	var block contracts.Block
-	switch h {
-	default:
-		return block, errors.New("TODO")
+func TestGetBlockByHeight(t *testing.T) {
+	t.Log("TestGetBlockByHeight")
+	{
+		bchain := blockchain.New(clock)
+		proxy := New(bchain)
+		h := 0
+		t.Log("\tGiven a proper block height argument", h)
+		{
+			block, err := proxy.GetBlockByHeight(h)
+			if err != nil {
+				t.Fatal("\t\tShould return block without err, got err: ", err)
+			}
+			t.Log("\t\tShould return block without error")
+			if block.Height != h {
+				t.Fatal("\t\tShould return block with height", h, "got:", block.Height)
+			}
+			t.Log("\t\tShould return block with correct height")
+			if block.Body != "ast" {
+				t.Fatal("\t\tShould return block with correct data, got:", block.Body)
+			}
+			t.Log("\t\tShould return block with correct data")
+		}
 	}
 }
 
