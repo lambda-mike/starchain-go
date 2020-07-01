@@ -169,8 +169,43 @@ func TestGetStarsByWalletAddress(t *testing.T) {
 	}
 }
 
-func (b BlockchainProxy) TestSubmitStar(star contracts.StarData) (contracts.Block, error) {
-	// TODO
-	var block contracts.Block
-	return block, nil
+func TestSubmitStar(t *testing.T) {
+	t.Log("TestSubmitStar")
+	{
+		bchain := blockchain.New(clock)
+		proxy := New(bchain)
+		t.Log("\tGiven proper star data")
+		{
+			var star contracts.StarData
+			star.Address = addr
+			star.Message = addr + ":1592156792:starRegistry"
+			star.Data = []byte("New Star")
+			star.Signature = "TODO"
+			block, err := proxy.SubmitStar(star)
+			if err != nil {
+				t.Fatal("\t\tShould return block without err, got err: ", err)
+			}
+			t.Log("\t\tShould return block without error")
+			if block.Height != 1 {
+				t.Fatal("\t\tShould return block with height", 1, "got:", block.Height)
+			}
+			t.Log("\t\tShould return block with correct height")
+			if block.Body != string(star.Data) {
+				t.Fatal("\t\tShould return block with correct data, got:", block.Body)
+			}
+			t.Log("\t\tShould return block with correct data")
+			if block.Hash != "TODO" {
+				t.Fatal("\t\tShould return block with correct hash, got:", block.Hash)
+			}
+			t.Log("\t\tShould return block with correct hash")
+			if block.Owner != addr {
+				t.Fatal("\t\tShould return block with correct owner, got:", block.Owner)
+			}
+			t.Log("\t\tShould return block with correct owner")
+			if block.PreviousBlockHash != "8a9a61241b4825dfa8884c04678899974ddfde55532a2fbadc07fc78472c8731" {
+				t.Fatal("\t\tShould return block with correct PreviousBlockHash, got:", block.PreviousBlockHash)
+			}
+			t.Log("\t\tShould return block with correct PreviousBlockHash")
+		}
+	}
 }

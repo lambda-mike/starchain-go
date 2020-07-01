@@ -71,7 +71,7 @@ func (b BlockchainProxy) GetStarsByWalletAddress(addr string) []string {
 }
 
 func (b BlockchainProxy) SubmitStar(star contracts.StarData) (contracts.Block, error) {
-	// TODO
 	var block contracts.Block
-	return block, nil
+	// TODO
+	return block, errors.New("TODO")
 }
