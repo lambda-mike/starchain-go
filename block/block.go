@@ -108,6 +108,11 @@ func (b *Block) GetHash() [sha256.Size]byte {
 	return h
 }
 
+// GetTimestamp
+func (b *Block) GetTimestamp() int64 {
+	return b.ts
+}
+
 // Validate method checks whether block was tampered with.
 // It does so by calculating the hash of the block without hash field and
 // comparing the result with the hash stored in that block.
