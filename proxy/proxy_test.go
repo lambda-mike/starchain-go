@@ -122,7 +122,7 @@ func TestGetBlockByHash(t *testing.T) {
 			}
 			t.Log("\t\tShould return block with correct PreviousBlockHash")
 		}
-		hash = "nope"
+		hash = "bada12bada12bada12bada12bada12bada12bada1bada1bada1bada122bada12"
 		t.Log("\tGiven a wrong block hash argument", hash)
 		{
 			_, err := proxy.GetBlockByHash(hash)
