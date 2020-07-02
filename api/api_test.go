@@ -31,9 +31,9 @@ func (b BlockchainMock) GetBlockByHeight(h int) (contracts.Block, error) {
 	case 0:
 		return mockBlocks[0], nil
 	case 1:
-		return block, errors.New("TODO")
+		return block, errors.New("Error height is 1")
 	default:
-		return block, errors.New("TODO")
+		return block, errors.New("Error default")
 	}
 }
 
@@ -45,7 +45,7 @@ func (b BlockchainMock) GetBlockByHash(h string) (contracts.Block, error) {
 	case "789abc987":
 		return mockBlocks[1], nil
 	default:
-		return block, errors.New("TODO")
+		return block, errors.New("Uknown hash error")
 	}
 }
 

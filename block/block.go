@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"github.com/starchain/utils"
 	"log"
 )
 
@@ -56,12 +57,6 @@ func New(ts int64, height int, owner string, prevHash *[sha256.Size]byte, data [
 	return &block
 }
 
-// TODO move to utils pkg
-// TODO add unit tests
-func HashToStr(hash [sha256.Size]byte) string {
-	return fmt.Sprintf("%x", hash)
-}
-
 // CalculateHash method calculates the sha256 hash of the block properties
 // except the hash field and returns that value.
 func (b *Block) CalculateHash() [sha256.Size]byte {
@@ -71,7 +66,7 @@ func (b *Block) CalculateHash() [sha256.Size]byte {
 	}
 	prevH := ""
 	if b.prevHash != nil {
-		prevH = HashToStr(*b.prevHash)
+		prevH = utils.HashToStr(*b.prevHash)
 	}
 	blockFields := fmt.Sprintf("|%d|%d|%s|%s|%s|", b.ts, b.height, b.owner, prevH, data)
 	return sha256.Sum256([]byte(blockFields))

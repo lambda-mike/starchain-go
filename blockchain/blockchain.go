@@ -2,13 +2,12 @@
 // It depends on block package
 package blockchain
 
-// TODO add logging
-
 import (
 	"crypto/sha256"
 	"errors"
 	"fmt"
 	"github.com/starchain/block"
+	"github.com/starchain/contracts"
 	"regexp"
 	"strconv"
 	"sync"
@@ -22,10 +21,9 @@ import (
 type Blockchain struct {
 	chain []*block.Block
 	mutex sync.RWMutex
-	clock Clock
+	clock contracts.Clock
 }
 
-// TODO move to contracts pkg; add DTO
 // StarRequest struct contains all data requiered to create a new star
 // in the blockchain.
 type StarRequest struct {
@@ -33,11 +31,6 @@ type StarRequest struct {
 	Msg      string
 	StarData []byte
 	Sig      string
-}
-
-// TODO move to contracts pkg
-type Clock interface {
-	GetTime() int64
 }
 
 type BlockchainClock struct{}
@@ -57,7 +50,7 @@ var (
 )
 
 // Factory function returning new Blockchain
-func New(clock Clock) *Blockchain {
+func New(clock contracts.Clock) *Blockchain {
 	var (
 		blockchain Blockchain
 	)

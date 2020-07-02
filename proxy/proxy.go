@@ -10,6 +10,7 @@ import (
 	"github.com/starchain/block"
 	"github.com/starchain/blockchain"
 	"github.com/starchain/contracts"
+	"github.com/starchain/utils"
 )
 
 type BlockchainProxy struct {
@@ -75,11 +76,10 @@ func (bp BlockchainProxy) SubmitStar(star contracts.StarData) (contracts.Block, 
 func MapBlockToContract(block *block.Block) contracts.Block {
 	var result contracts.Block
 	result.Body = string(block.GetData())
-	// TODO reuse utils.HashToStr fn
-	result.Hash = fmt.Sprintf("%x", block.GetHash())
+	result.Hash = utils.HashToStr(block.GetHash())
 	result.Height = block.GetHeight()
 	result.Owner = block.GetOwner()
-	result.PreviousBlockHash = fmt.Sprintf("%x", block.GetPrevHash())
+	result.PreviousBlockHash = utils.HashToStr(block.GetPrevHash())
 	result.Time = block.GetTimestamp()
 	return result
 }

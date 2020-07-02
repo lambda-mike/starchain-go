@@ -51,8 +51,6 @@ func TestGetChainHeight(t *testing.T) {
 			}
 			t.Log("\t\tShould return 1")
 		}
-		// TODO add block, test height
-		// TODO add and get blocks in parallel
 	}
 }
 
@@ -97,8 +95,8 @@ func TestSubmitStar(t *testing.T) {
 		var (
 			addr = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
 			msg  = fmt.Sprintf("%s:%d:starRegistry", addr, 1592156792-3*60)
-			star = []byte("TODO star")
-			sig  = "TODO sig"
+			star = []byte("My star")
+			sig  = "sig"
 			req  = StarRequest{addr, msg, star, sig}
 		)
 		t.Log("\tGiven correct params")
@@ -223,7 +221,7 @@ func TestGetBlockByHash(t *testing.T) {
 			addr = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
 			msg  = fmt.Sprintf("%s:%d:starRegistry", addr, 1592156792-3*60)
 			star = []byte("Brand new Star")
-			sig  = "TODO sig"
+			sig  = "sig"
 			req  = StarRequest{addr, msg, star, sig}
 		)
 		clock := BlockchainClockMock{}
@@ -298,7 +296,7 @@ func TestGetBlockByHeight(t *testing.T) {
 			addr = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
 			msg  = fmt.Sprintf("%s:%d:starRegistry", addr, 1592156792-3*60)
 			star = []byte("Brand new Star")
-			sig  = "TODO sig"
+			sig  = "sig"
 			req  = StarRequest{addr, msg, star, sig}
 		)
 		height := 1
@@ -340,7 +338,7 @@ func TestGetStarsByWalletAddress(t *testing.T) {
 					addr = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
 					msg  = fmt.Sprintf("%s:%d:starRegistry", addr, 1592156792-3*60)
 					star = []byte("Brand new Star")
-					sig  = "TODO sig"
+					sig  = "sig"
 					req  = StarRequest{addr, msg, star, sig}
 				)
 				clock := BlockchainClockMock{}
@@ -368,7 +366,7 @@ func TestGetStarsByWalletAddress(t *testing.T) {
 					msg2  = fmt.Sprintf("%s:%d:starRegistry", addr2, 1592156792-2*60)
 					star1 = []byte("Brand new Star 1")
 					star2 = []byte("Brand new Star 2")
-					sig   = "TODO sig"
+					sig   = "sig"
 					req1  = StarRequest{addr1, msg1, star1, sig}
 					req2  = StarRequest{addr2, msg2, star2, sig}
 				)
@@ -414,7 +412,7 @@ func TestValidateChain(t *testing.T) {
 					addr1 = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
 					msg1  = fmt.Sprintf("%s:%d:starRegistry", addr1, 1592156792-3*60)
 					star1 = []byte("Brand new Star 1")
-					sig   = "TODO sig"
+					sig   = "sig"
 					req1  = StarRequest{addr1, msg1, star1, sig}
 				)
 				clock := BlockchainClockMock{}
@@ -432,7 +430,7 @@ func TestValidateChain(t *testing.T) {
 					addr1 = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
 					msg1  = fmt.Sprintf("%s:%d:starRegistry", addr1, 1592156792-3*60)
 					star1 = []byte("Brand new Star 1")
-					sig   = "TODO sig"
+					sig   = "sig"
 					req1  = StarRequest{addr1, msg1, star1, sig}
 				)
 				var (

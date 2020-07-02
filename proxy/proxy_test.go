@@ -14,9 +14,8 @@ func (b BlockchainClockMock) GetTime() int64 {
 }
 
 var (
-	addr string = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
-	// TODO move Clock to contracts
-	clock blockchain.Clock = BlockchainClockMock{}
+	addr  string          = "1FzpnkhbAteDkU1wXDtd8kKizQhqWcsrWe"
+	clock contracts.Clock = BlockchainClockMock{}
 )
 
 func TestRequestMessageOwnershipVerification(t *testing.T) {
@@ -180,7 +179,7 @@ func TestSubmitStar(t *testing.T) {
 			star.Address = addr
 			star.Message = addr + ":1592156792:starRegistry"
 			star.Data = []byte("New Star")
-			star.Signature = "TODO"
+			star.Signature = "Sig"
 			block, err := proxy.SubmitStar(star)
 			if err != nil {
 				t.Fatal("\t\tShould return block without err, got err: ", err)

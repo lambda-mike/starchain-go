@@ -12,9 +12,8 @@ import (
 func main() {
 	log.Println("Hello StarchainGo!")
 	var (
-		bchain *blockchain.Blockchain
-		// TODO move to contracts
-		clock           blockchain.Clock
+		bchain          *blockchain.Blockchain
+		clock           contracts.Clock
 		blockchainProxy contracts.BlockchainOperator
 	)
 	clock = blockchain.BlockchainClock{}

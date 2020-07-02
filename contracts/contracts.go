@@ -23,3 +23,7 @@ type BlockchainOperator interface {
 	GetStarsByWalletAddress(addr string) []string
 	SubmitStar(star StarData) (Block, error)
 }
+
+type Clock interface {
+	GetTime() int64
+}
