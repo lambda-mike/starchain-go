@@ -306,14 +306,14 @@ func TestSubmitStar(t *testing.T) {
 		t.Log("Server url: ", server.URL)
 		t.Log("\tGiven a need to test endpoint /submitStar")
 		{
-			t.Log("\tWhen called with proper data")
+			t.Log("\tWhen called with JSON string data")
 			{
 				addr := "a1b2c3"
 				msg := fmt.Sprintf("%s:%d:starRegistry", addr, 1592156792)
 				star := StarDto{
 					Address:   addr,
 					Message:   msg,
-					Data:      []byte("This is brand new Star"),
+					Data:      json.RawMessage("\"This is brand new Star\""),
 					Signature: "doesnotmatter",
 				}
 				data, _ := json.Marshal(star)

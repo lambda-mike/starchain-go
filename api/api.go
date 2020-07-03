@@ -27,10 +27,10 @@ type BlockDto struct {
 }
 
 type StarDto struct {
-	Address   string `json:"address"`
-	Message   string `json:"message"`
-	Data      []byte `json:"star"`
-	Signature string `json:"signature"`
+	Address   string          `json:"address"`
+	Message   string          `json:"message"`
+	Data      json.RawMessage `json:"star"`
+	Signature string          `json:"signature"`
 }
 
 var blockchain *contracts.BlockchainOperator
