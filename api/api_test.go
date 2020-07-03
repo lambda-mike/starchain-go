@@ -310,10 +310,11 @@ func TestSubmitStar(t *testing.T) {
 			{
 				addr := "a1b2c3"
 				msg := fmt.Sprintf("%s:%d:starRegistry", addr, 1592156792)
+				starData := "\"This is brand new Star\""
 				star := StarDto{
 					Address:   addr,
 					Message:   msg,
-					Data:      json.RawMessage("\"This is brand new Star\""),
+					Data:      json.RawMessage(starData),
 					Signature: "doesnotmatter",
 				}
 				data, _ := json.Marshal(star)
@@ -340,6 +341,50 @@ func TestSubmitStar(t *testing.T) {
 					t.Fatalf("\t\tShould return block with height: %v, got: %v", 1, block.Height)
 				}
 				t.Logf("\t\tShould return block with correct height")
+				if block.Body != starData {
+					t.Fatalf("\t\tShould return block with data: %v, got: %v", starData, block.Body)
+				}
+				t.Logf("\t\tShould return block with correct data")
+			}
+			t.Log("\tWhen called with JSON object data")
+			{
+				addr := "a4b5c6"
+				msg := fmt.Sprintf("%s:%d:starRegistry", addr, 1592156792)
+				starData := "{\"text\":\"This is brand new Star\"}"
+				star := StarDto{
+					Address:   addr,
+					Message:   msg,
+					Data:      json.RawMessage(starData),
+					Signature: "doesnotmatter",
+				}
+				data, _ := json.Marshal(star)
+				response, err := http.Post(server.URL+"/submitStar", "application/json", bytes.NewReader(data))
+				if err != nil {
+					t.Fatalf("\t\tShould be able to post a star, got err: %v", err)
+				}
+				t.Log("\t\tShould be able to post a star")
+				if response.StatusCode != http.StatusCreated {
+					body, _ := ioutil.ReadAll(response.Body)
+					t.Fatalf("\t\tShould get response 201 Created, got: %v, err: %v", response.StatusCode, string(body))
+				}
+				t.Log("\t\tShould get response 201 Created")
+				var block contracts.Block
+				if err := json.NewDecoder(response.Body).Decode(&block); err != nil {
+					t.Fatalf("\t\tShould decode response body, got err: %v; json: %v", err, response.Body)
+				}
+				t.Logf("\t\tShould decode response body %s", response.Body)
+				if block.Owner != addr {
+					t.Fatalf("\t\tShould return block with owner: %v, got: %v", addr, block.Owner)
+				}
+				t.Logf("\t\tShould return block with correct owner")
+				if block.Height != 1 {
+					t.Fatalf("\t\tShould return block with height: %v, got: %v", 1, block.Height)
+				}
+				t.Logf("\t\tShould return block with correct height")
+				if block.Body != starData {
+					t.Fatalf("\t\tShould return block with data: %v, got: %v", starData, block.Body)
+				}
+				t.Logf("\t\tShould return block with correct data")
 			}
 			t.Log("\tWhen called with wrong data")
 			{
