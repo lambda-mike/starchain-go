@@ -71,7 +71,6 @@ func (a *restApi) Add(regex string, handler http.HandlerFunc) {
 
 func (a *restApi) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	pattern := req.Method + " " + req.URL.Path
-	log.Println("DBG: ServeHTTP: ", pattern)
 	for regex, handler := range a.handlers {
 		if a.cache[regex].MatchString(pattern) {
 			handler(res, req)
