@@ -289,6 +289,9 @@ func TestGetBlocks(t *testing.T) {
 				if len(stars) != 0 {
 					t.Fatalf("\t\tShould return empty slice, got: %v", stars)
 				}
+				if stars == nil {
+					t.Fatalf("\t\tShould return not nil slice, got: nil")
+				}
 				t.Log("\t\tShould return empty slice")
 			}
 		}

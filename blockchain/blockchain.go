@@ -169,7 +169,7 @@ func (b *Blockchain) GetBlockByHeight(height int) (*block.Block, error) {
 func (b *Blockchain) GetStarsByWalletAddress(addr string) []string {
 	b.mutex.RLock()
 	defer b.mutex.RUnlock()
-	var stars []string
+	stars := make([]string, 0)
 	// Ommit genesis block - it has no owner
 	for _, block := range b.chain[1:] {
 		if block.GetOwner() == addr {
