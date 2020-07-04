@@ -12,11 +12,12 @@ import (
 	"testing"
 )
 
+// We store raw JSON as data (it comes from http request)
 var mockBlocks [4]contracts.Block = [...]contracts.Block{
-	contracts.Block{"Genesis Block", "123abc456", 0, "", "", 1592156792},
-	contracts.Block{"Regular Block", "789abc987", 0, "7a7b7c", "123abc456", 1592156794},
-	contracts.Block{"Other Block", "fff333", 0, "333fff", "789abc987", 1592156795},
-	contracts.Block{"Regular Block II", "789abc987", 0, "7a7b7c", "fff333", 1592156796},
+	contracts.Block{`"Genesis Block"`, "123abc456", 0, "", "", 1592156792},
+	contracts.Block{`"Regular Block"`, "789abc987", 0, "7a7b7c", "123abc456", 1592156794},
+	contracts.Block{`"Other Block"`, "fff333", 0, "333fff", "789abc987", 1592156795},
+	contracts.Block{`"Regular Block II"`, "789abc987", 0, "7a7b7c", "fff333", 1592156796},
 }
 
 type BlockchainMock struct{}
@@ -258,18 +259,16 @@ func TestGetBlocks(t *testing.T) {
 					t.Fatalf("\t\tShould get response 200 OK, got: %v", response.StatusCode)
 				}
 				t.Log("\t\tShould get response 200 OK")
-				var blocks []string
-				if err := json.NewDecoder(response.Body).Decode(&blocks); err != nil {
-					t.Fatalf("\t\tShould decode response body, got err: %v; json: %v", err, response.Body)
+				body, _ := ioutil.ReadAll(response.Body)
+				rawBlocks := [...]json.RawMessage{
+					json.RawMessage(mockBlocks[1].Body),
+					json.RawMessage(mockBlocks[3].Body),
 				}
-				t.Logf("\t\tShould decode response body %s", response.Body)
-				if blocks[0] != mockBlocks[1].Body {
-					t.Fatalf("\t\tShould return correct block: %v, got: %v", mockBlocks[1].Body, blocks[0])
+				blocksJson, _ := json.Marshal(rawBlocks)
+				if string(blocksJson) != string(body) {
+					t.Fatalf("\t\tShould return correct body: %v, got: %v", blocksJson, body)
 				}
-				if blocks[1] != mockBlocks[3].Body {
-					t.Fatalf("\t\tShould return correct block: %v, got: %v", mockBlocks[3].Body, blocks[1])
-				}
-				t.Log("\t\tShould return blocks data belonging to owner: ", owner)
+				t.Log("\t\tShould return correct body")
 			}
 			t.Log("\tWhen called with wrong address")
 			{
@@ -310,7 +309,7 @@ func TestSubmitStar(t *testing.T) {
 			{
 				addr := "a1b2c3"
 				msg := fmt.Sprintf("%s:%d:starRegistry", addr, 1592156792)
-				starData := "\"This is brand new Star\""
+				starData := `"This is brand new Star"`
 				star := StarDto{
 					Address:   addr,
 					Message:   msg,
@@ -350,7 +349,7 @@ func TestSubmitStar(t *testing.T) {
 			{
 				addr := "a4b5c6"
 				msg := fmt.Sprintf("%s:%d:starRegistry", addr, 1592156792)
-				starData := "{\"text\":\"This is brand new Star\"}"
+				starData := `{"text":"This is brand new Star"}`
 				star := StarDto{
 					Address:   addr,
 					Message:   msg,
