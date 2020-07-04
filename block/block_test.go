@@ -116,6 +116,22 @@ func TestNewBadHeight(t *testing.T) {
 	}
 }
 
+func TestDecodeData(t *testing.T) {
+	t.Log("DecodeData")
+	{
+		data := []byte("\"This is random JSON string\"")
+		t.Logf("\tGiven a block with data (%s)", data)
+		{
+			block := New(ts, h, owner, &prevH, data)
+			actual := block.DecodeData()
+			if string(actual) != string(data) {
+				t.Fatalf("\t\tShould return the same data, got: (%s)", actual)
+			}
+			t.Logf("\t\tShould return the same data")
+		}
+	}
+}
+
 func TestGetData(t *testing.T) {
 	t.Log("GetData")
 	{
@@ -124,7 +140,7 @@ func TestGetData(t *testing.T) {
 		{
 			block := New(ts, h, owner, &prevH, data)
 			actual := block.GetData()
-			if string(actual) != string(data) {
+			if string(actual) != "22546869732069732072616e646f6d204a534f4e20737472696e6722" {
 				t.Fatalf("\t\tShould return the same data, got: (%s)", actual)
 			}
 			t.Logf("\t\tShould return the same data")

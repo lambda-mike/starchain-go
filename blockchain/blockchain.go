@@ -173,7 +173,7 @@ func (b *Blockchain) GetStarsByWalletAddress(addr string) []string {
 	// Ommit genesis block - it has no owner
 	for _, block := range b.chain[1:] {
 		if block.GetOwner() == addr {
-			stars = append(stars, string(block.GetData()))
+			stars = append(stars, string(block.DecodeData()))
 		}
 	}
 	return stars

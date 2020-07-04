@@ -56,9 +56,9 @@ func TestGetBlockByHeight(t *testing.T) {
 				t.Fatal("\t\tShould return block with height", h, "got:", block.Height)
 			}
 			t.Log("\t\tShould return block with correct height")
-			expectedBody := "Genesis Gopher Block"
-			if block.Body != expectedBody {
-				t.Fatal("\t\tShould return block with correct data, got:", block.Body)
+			expectedBody := "47656e6573697320476f7068657220426c6f636b"
+			if string(block.Body) != expectedBody {
+				t.Fatal("\t\tShould return block with correct data, got:", string(block.Body))
 			}
 			t.Log("\t\tShould return block with correct data")
 			if block.Hash != "8a9a61241b4825dfa8884c04678899974ddfde55532a2fbadc07fc78472c8731" {
@@ -103,7 +103,7 @@ func TestGetBlockByHash(t *testing.T) {
 				t.Fatal("\t\tShould return block with height", 0, "got:", block.Height)
 			}
 			t.Log("\t\tShould return block with correct height")
-			expectedBody := "Genesis Gopher Block"
+			expectedBody := "47656e6573697320476f7068657220426c6f636b"
 			if block.Body != expectedBody {
 				t.Fatal("\t\tShould return block with correct data, got:", block.Body)
 			}
@@ -189,7 +189,7 @@ func TestSubmitStar(t *testing.T) {
 				t.Fatal("\t\tShould return block with height", 1, "got:", block.Height)
 			}
 			t.Log("\t\tShould return block with correct height")
-			if block.Body != string(star.Data) {
+			if string(block.Body) != "4e65772053746172" {
 				t.Fatal("\t\tShould return block with correct data, got:", block.Body)
 			}
 			t.Log("\t\tShould return block with correct data")

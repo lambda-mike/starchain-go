@@ -1,11 +1,13 @@
 package block
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"fmt"
 	"github.com/starchain/utils"
+	"io"
 	"log"
 )
 
@@ -72,11 +74,21 @@ func (b *Block) CalculateHash() [sha256.Size]byte {
 	return sha256.Sum256([]byte(blockFields))
 }
 
-// GetData method returns data stored inside a block decoded from hex
-func (b *Block) GetData() []byte {
+// DecodeData method returns data stored inside a block decoded from hex
+func (b *Block) DecodeData() []byte {
 	decoded := make([]byte, hex.DecodedLen(len(b.data)))
 	hex.Decode(decoded, b.data)
 	return decoded
+}
+
+// GetData method returns data stored inside a block decoded in hex format
+func (b *Block) GetData() []byte {
+	buffer := bytes.NewBufferString("")
+	n, err := io.Copy(buffer, bytes.NewBuffer(b.data))
+	if err != nil || n != int64(len(b.data)) {
+		log.Panic("ERR: GetData failed to return a copy of Block.data", err)
+	}
+	return buffer.Bytes()
 }
 
 // GetOwner method returns owner stored inside a block

@@ -27,7 +27,10 @@ func TestNew(t *testing.T) {
 			if len(blockchain.chain) <= 0 {
 				t.Fatalf("\t\tShould contain genesis block, but is empty")
 			}
-			if string(blockchain.chain[0].GetData()) != "Genesis Gopher Block" {
+			if actual := string(blockchain.chain[0].GetData()); actual != "47656e6573697320476f7068657220426c6f636b" {
+				t.Fatalf("\t\tGenesis block should contain proper phrase, got: %s", actual)
+			}
+			if string(blockchain.chain[0].DecodeData()) != "Genesis Gopher Block" {
 				t.Fatalf("\t\tGenesis block should contain proper phrase")
 			}
 			if blockchain.chain[0].GetOwner() != "" {
@@ -107,8 +110,11 @@ func TestSubmitStar(t *testing.T) {
 			if err != nil {
 				t.Fatal("\t\tShould return block without errors, got err: ", err)
 			}
-			if bData := block.GetData(); string(bData) != string(star) {
-				t.Fatal("\t\tShould return block with original data, got: ", bData)
+			if bData := block.DecodeData(); string(bData) != string(star) {
+				t.Fatal("\t\tShould return block with original data, got: ", string(bData))
+			}
+			if bData := block.GetData(); string(bData) != "4d792073746172" {
+				t.Fatal("\t\tShould return block with hex data, got: ", string(bData))
 			}
 			if bOwner := block.GetOwner(); bOwner != addr {
 				t.Fatal("\t\tShould return block with correct owner, got: ", bOwner)
