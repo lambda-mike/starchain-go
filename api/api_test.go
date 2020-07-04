@@ -264,9 +264,12 @@ func TestGetBlocks(t *testing.T) {
 					json.RawMessage(mockBlocks[1].Body),
 					json.RawMessage(mockBlocks[3].Body),
 				}
-				blocksJson, _ := json.Marshal(rawBlocks)
+				blocksJson, err := json.Marshal(rawBlocks)
+				if err != nil {
+					t.Fatal("\t\tShould not get an error when marshalling rawBlocks: ", err)
+				}
 				if string(blocksJson) != string(body) {
-					t.Fatalf("\t\tShould return correct body: %v, got: %v", blocksJson, body)
+					t.Fatalf("\t\tShould return correct body: %v, got: %v", string(blocksJson), string(body))
 				}
 				t.Log("\t\tShould return correct body")
 			}

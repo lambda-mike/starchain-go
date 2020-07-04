@@ -163,7 +163,11 @@ func getBlocks(res http.ResponseWriter, req *http.Request) {
 	}
 	addr := parts[2]
 	blocksData := (*blockchain).GetStarsByWalletAddress(addr)
-	json, err := json.Marshal(blocksData)
+	blocksJson := make([]json.RawMessage, len(blocksData))
+	for i, d := range blocksData {
+		blocksJson[i] = json.RawMessage(d)
+	}
+	json, err := json.Marshal(blocksJson)
 	if err != nil {
 		log.Println("ERR: getBlocks failed to marshal blocks: ", err)
 		res.WriteHeader(http.StatusBadRequest)
