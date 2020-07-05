@@ -42,8 +42,8 @@ func Create(b *contracts.BlockchainOperator) http.Handler {
 	api.Add("GET /block/\\d+", getBlockByHeight)
 	api.Add("GET /block/hash/\\w+", getBlockByHash)
 	api.Add("GET /blocks/\\w+", getBlocks)
-	api.Add("POST /requestValidation", requestValidation)
-	api.Add("POST /submitStar", submitStar)
+	api.Add("POST /requestvalidation", requestValidation)
+	api.Add("POST /submitstar", submitStar)
 	log.Println("INFO: REST API created successfully")
 	return api
 }
@@ -70,7 +70,7 @@ func (a *restApi) Add(regex string, handler http.HandlerFunc) {
 }
 
 func (a *restApi) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	pattern := req.Method + " " + req.URL.Path
+	pattern := req.Method + " " + strings.ToLower(req.URL.Path)
 	for regex, handler := range a.handlers {
 		if a.cache[regex].MatchString(pattern) {
 			handler(res, req)
