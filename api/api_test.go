@@ -20,6 +20,8 @@ var mockBlocks [4]contracts.Block = [...]contracts.Block{
 	contracts.Block{`"Regular Block II"`, "789abc987", 0, "7a7b7c", "fff333", 1592156796},
 }
 
+var validateScenario int
+
 type BlockchainMock struct{}
 
 func (b BlockchainMock) RequestMessageOwnershipVerification(addr string) (string, error) {
@@ -67,6 +69,16 @@ func (b BlockchainMock) SubmitStar(star contracts.StarData) (contracts.Block, er
 		return block, nil
 	} else {
 		return block, errors.New("Empty message error!")
+	}
+}
+
+func (b BlockchainMock) Validate() (bool, []string) {
+	errs := []string{"Err1", "Err2", "Err3"}
+	switch validateScenario {
+	case 0:
+		return true, []string{}
+	default:
+		return false, errs
 	}
 }
 
@@ -436,31 +448,10 @@ func TestValidate(t *testing.T) {
 				}
 				t.Log("\t\tShould return correct validation")
 			}
-			t.Log("\tWhen called on blockchain with 3 blocks")
-			{
-				// TODO add blocks
-				response, err := http.Get(server.URL + "/validate")
-				if err != nil {
-					t.Fatal("\t\tShould not get an error when validating chain, got: ", err)
-				}
-				t.Log("\t\tShould not get an error when validating chain")
-				if response.StatusCode != 200 {
-					t.Fatal("\t\tShould return OK status code, got: ", response.StatusCode)
-				}
-				t.Log("\t\tShould return OK status code")
-				var validation ValidationDto
-				if err := json.NewDecoder(response.Body).Decode(&validation); err != nil {
-					t.Fatalf("\t\tShould decode ValidationDto, got error: %v", err)
-				}
-				t.Log("\t\tShould decode ValidationDto")
-				if !validation.Valid || len(validation.ErrorLog) > 0 {
-					t.Fatalf("\t\tShould return correct validation, got: %v", validation)
-				}
-				t.Log("\t\tShould return correct validation")
-			}
 			t.Log("\tWhen called on blockchain with tempered blocks")
 			{
-				// TODO modify blocks
+				// Set flag to force validate method in mocked Proxy to fail
+				validateScenario = 1
 				response, err := http.Get(server.URL + "/validate")
 				if err != nil {
 					t.Fatal("\t\tShould not get an error when validating chain, got: ", err)
