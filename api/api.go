@@ -33,6 +33,11 @@ type StarDto struct {
 	Signature string          `json:"signature"`
 }
 
+type ValidationDto struct {
+	Valid    bool     `json:"valid"`
+	ErrorLog []string `json:"errorLog"`
+}
+
 var blockchain *contracts.BlockchainOperator
 
 func Create(b *contracts.BlockchainOperator) http.Handler {
