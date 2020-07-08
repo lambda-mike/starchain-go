@@ -426,7 +426,15 @@ func TestValidate(t *testing.T) {
 					t.Fatalf("\t\tShould get response 200 OK, got: %v", response.StatusCode)
 				}
 				t.Log("\t\tShould get response 200 OK")
-				// TODO decode response to Dto
+				var validation ValidationDto
+				if err := json.NewDecoder(response.Body).Decode(&validation); err != nil {
+					t.Fatalf("\t\tShould decode ValidationDto, got error: %v", err)
+				}
+				t.Log("\t\tShould decode ValidationDto")
+				if !validation.Valid || len(validation.ErrorLog) > 0 {
+					t.Fatalf("\t\tShould return correct validation, got: %v", validation)
+				}
+				t.Log("\t\tShould return correct validation")
 			}
 			t.Log("\tWhen called on blockchain with 3 blocks")
 			{
@@ -440,10 +448,15 @@ func TestValidate(t *testing.T) {
 					t.Fatal("\t\tShould return OK status code, got: ", response.StatusCode)
 				}
 				t.Log("\t\tShould return OK status code")
-				// TODO decode response to valid DTO
-				//if err := json.NewDecoder(response.Body).Decode(&validationResult); err != nil {
-				//	t.Fatalf("\t\tShould decode response body, got err: %v; json: %v", err, response.Body)
-				//}
+				var validation ValidationDto
+				if err := json.NewDecoder(response.Body).Decode(&validation); err != nil {
+					t.Fatalf("\t\tShould decode ValidationDto, got error: %v", err)
+				}
+				t.Log("\t\tShould decode ValidationDto")
+				if !validation.Valid || len(validation.ErrorLog) > 0 {
+					t.Fatalf("\t\tShould return correct validation, got: %v", validation)
+				}
+				t.Log("\t\tShould return correct validation")
 			}
 			t.Log("\tWhen called on blockchain with tempered blocks")
 			{
@@ -457,10 +470,15 @@ func TestValidate(t *testing.T) {
 					t.Fatal("\t\tShould return OK status code, got: ", response.StatusCode)
 				}
 				t.Log("\t\tShould return OK status code")
-				// TODO decode response to valid DTO
-				//if err := json.NewDecoder(response.Body).Decode(&validationResult); err != nil {
-				//	t.Fatalf("\t\tShould decode response body, got err: %v; json: %v", err, response.Body)
-				//}
+				var validation ValidationDto
+				if err := json.NewDecoder(response.Body).Decode(&validation); err != nil {
+					t.Fatalf("\t\tShould decode ValidationDto, got error: %v", err)
+				}
+				t.Log("\t\tShould decode ValidationDto")
+				if validation.Valid || len(validation.ErrorLog) == 0 {
+					t.Fatalf("\t\tShould return failed validation, got: %v", validation)
+				}
+				t.Log("\t\tShould return failed validation")
 			}
 		}
 	}
