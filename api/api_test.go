@@ -406,3 +406,62 @@ func TestSubmitStar(t *testing.T) {
 		}
 	}
 }
+
+func TestValidate(t *testing.T) {
+	t.Log("Validate")
+	{
+		server := createApi()
+		defer server.Close()
+		t.Log("Server url: ", server.URL)
+		t.Log("\tGiven a need to test endpoint /validate")
+		{
+			t.Log("\tWhen called on fresh blockchain")
+			{
+				response, err := http.Get(server.URL + "/validate")
+				if err != nil {
+					t.Fatalf("\t\tShould be able to get validation result, got err: %v", err)
+				}
+				t.Log("\t\tShould be able to get validation result")
+				if response.StatusCode != 200 {
+					t.Fatalf("\t\tShould get response 200 OK, got: %v", response.StatusCode)
+				}
+				t.Log("\t\tShould get response 200 OK")
+				// TODO decode response to Dto
+			}
+			t.Log("\tWhen called on blockchain with 3 blocks")
+			{
+				// TODO add blocks
+				response, err := http.Get(server.URL + "/validate")
+				if err != nil {
+					t.Fatal("\t\tShould not get an error when validating chain, got: ", err)
+				}
+				t.Log("\t\tShould not get an error when validating chain")
+				if response.StatusCode != 200 {
+					t.Fatal("\t\tShould return OK status code, got: ", response.StatusCode)
+				}
+				t.Log("\t\tShould return OK status code")
+				// TODO decode response to valid DTO
+				//if err := json.NewDecoder(response.Body).Decode(&validationResult); err != nil {
+				//	t.Fatalf("\t\tShould decode response body, got err: %v; json: %v", err, response.Body)
+				//}
+			}
+			t.Log("\tWhen called on blockchain with tempered blocks")
+			{
+				// TODO modify blocks
+				response, err := http.Get(server.URL + "/validate")
+				if err != nil {
+					t.Fatal("\t\tShould not get an error when validating chain, got: ", err)
+				}
+				t.Log("\t\tShould not get an error when validating chain")
+				if response.StatusCode != 200 {
+					t.Fatal("\t\tShould return OK status code, got: ", response.StatusCode)
+				}
+				t.Log("\t\tShould return OK status code")
+				// TODO decode response to valid DTO
+				//if err := json.NewDecoder(response.Body).Decode(&validationResult); err != nil {
+				//	t.Fatalf("\t\tShould decode response body, got err: %v; json: %v", err, response.Body)
+				//}
+			}
+		}
+	}
+}
