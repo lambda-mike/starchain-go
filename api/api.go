@@ -49,6 +49,7 @@ func Create(b *contracts.BlockchainOperator) http.Handler {
 	api.Add("GET /blocks/\\w+", getBlocks)
 	api.Add("POST /requestvalidation", requestValidation)
 	api.Add("POST /submitstar", submitStar)
+	api.Add("GET /validate", validate)
 	log.Println("INFO: REST API created successfully")
 	return api
 }
@@ -257,4 +258,22 @@ func respondWithBlock(res http.ResponseWriter, req *http.Request, block *contrac
 	res.WriteHeader(http.StatusOK)
 	res.Header().Set("Content-Type", "application/json")
 	fmt.Fprint(res, string(blockJson))
+}
+
+func validate(res http.ResponseWriter, req *http.Request) {
+	log.Println("INFO: validate")
+	var validation ValidationDto
+	isValid, errorLog := (*blockchain).Validate()
+	validation.Valid = isValid
+	validation.ErrorLog = errorLog
+	json, err := json.Marshal(validation)
+	if err != nil {
+		log.Println("ERR: validate failed to marshal validation DTO: ", err)
+		res.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(res, "Failed to serialize validation result into JSON")
+		return
+	}
+	res.WriteHeader(http.StatusOK)
+	res.Header().Set("Content-Type", "application/json")
+	fmt.Fprint(res, string(json))
 }

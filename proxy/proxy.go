@@ -83,3 +83,8 @@ func MapBlockToContract(block *block.Block) contracts.Block {
 	result.Time = block.GetTimestamp()
 	return result
 }
+
+func (bp BlockchainProxy) Validate() (bool, []string) {
+	// TODO implement Validate
+	return false, nil
+}

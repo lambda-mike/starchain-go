@@ -22,6 +22,7 @@ type BlockchainOperator interface {
 	GetBlockByHash(h string) (Block, error)
 	GetStarsByWalletAddress(addr string) []string
 	SubmitStar(star StarData) (Block, error)
+	Validate() (bool, []string)
 }
 
 type Clock interface {
