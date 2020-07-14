@@ -219,3 +219,43 @@ func TestSubmitStar(t *testing.T) {
 		}
 	}
 }
+
+func TestValidate(t *testing.T) {
+	t.Log("TestValidate")
+	{
+		t.Log("\tGiven a fresh blockchain")
+		{
+			t.Log("\t\tWhen no changes are made to the blockchain")
+			{
+				bchain := blockchain.New(clock)
+				proxy := New(bchain)
+				isValid, errs := proxy.Validate()
+				if len(errs) > 0 {
+					t.Fatal("\t\t\tShould not return any errors, got:", errs)
+				}
+				t.Log("\t\tShould not return any errors")
+				if !isValid {
+					t.Fatal("\t\t\tShould be valid, got:", isValid)
+				}
+				t.Log("\t\tShould be vaild")
+			}
+			t.Log("\t\tWhen new block is added")
+			{
+				starsData := []byte("Data 1")
+				bchain := blockchain.New(clock)
+				owner := "abcdef"
+				bchain.AddBlock(owner, starsData)
+				proxy := New(bchain)
+				isValid, errs := proxy.Validate()
+				if len(errs) > 0 {
+					t.Fatal("\t\t\tShould not return any errors, got:", errs)
+				}
+				t.Log("\t\tShould not return any errors")
+				if !isValid {
+					t.Fatal("\t\t\tShould be valid, got:", isValid)
+				}
+				t.Log("\t\tShould be vaild")
+			}
+		}
+	}
+}
