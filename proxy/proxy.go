@@ -85,6 +85,14 @@ func MapBlockToContract(block *block.Block) contracts.Block {
 }
 
 func (bp BlockchainProxy) Validate() (bool, []string) {
-	// TODO implement Validate
-	return false, nil
+	var msgs []string
+	errs := bp.blockchain.ValidateChain()
+	isValid := len(errs) == 0
+	if !isValid {
+		msgs := make([]string, len(errs))
+		for i, e := range errs {
+			msgs[i] = e.Error()
+		}
+	}
+	return isValid, msgs
 }
