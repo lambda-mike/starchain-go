@@ -257,6 +257,5 @@ func TestValidate(t *testing.T) {
 				t.Log("\t\tShould be vaild")
 			}
 		}
-		// TODO Add negative tests after proxy refactoring
 	}
 }
