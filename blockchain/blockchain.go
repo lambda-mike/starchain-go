@@ -94,7 +94,6 @@ func (b *Blockchain) IsMessageOutdated(addr string, msg string) (bool, error) {
 		}
 		return duration >= FIVE_MIN, nil
 	}
-	return true, errors.New("Undetermined result for timestamp checking")
 }
 
 func (b *Blockchain) AddBlock(owner string, starData []byte) *block.Block {
