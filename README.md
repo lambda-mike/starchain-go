@@ -1,5 +1,7 @@
 # StarchainGo
 
+![StarchainGo](https://github.com/lambda-mike/starchain-go/workflows/Starchain%20Go/badge.svg)
+
 This is a simplified in-memory blockchain implementation written in Go based on the first project from Udacity _Blockchain Developer Nanodegree Program_ course. Udacity kindly provided instructions and boilerplate code - this implementation is based on those great learning resources.
 
 Disclaimer: this is NOT perfect, idiomatic Go, I treat this project as an excuse to learn Go lang and experiment.
